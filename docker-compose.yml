@@ -1,24 +1,11 @@
 version: "3.9"
 services:
-  middleware-cicd:
-    image: casper-blockexplorer-middleware
+  casper-blockexplorer-middleware-cicd:
+    image: casper-blockexplorer-middleware-cicd
     build:
       context: .
       dockerfile: Dockerfile
     environment:
-      - NODE_URLS=https://rpc.mainnet.casperlabs.io/rpc
+      - NODE_URLS=http://3.138.177.248:7777/rpc
     ports:
       - "4000:4000"
-
-
-
-
-
-version: "3.9"
-services:
-  block-explorer:
-    image: casperlabs/blockexplorer:1.1.0
-    environment:
-      - NODE_URL=https://rpc.mainnet.casperlabs.io/rpc
-    ports:
-      - "3000:3000"
