@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { Peer } from "../types";
 import { ApiError } from "../utils";
-import { getPeers, setPeers } from "./cache";
+import { setPeers } from "./cache";
 import { nodeManager } from "./node-manager";
 
 export const fetchPeerInfo = async (ip: string) => {
@@ -31,11 +31,6 @@ export const fetchPeerInfo = async (ip: string) => {
 };
 
 export const fetchPeers = async (update = false): Promise<Peer[]> => {
-  const existPeers = getPeers();
-  if (existPeers && !update) {
-    return existPeers;
-  }
-
   const rpcCall = async () => {
     const activeNode = nodeManager.getActiveNode();
     try {
@@ -58,14 +53,16 @@ export const fetchPeers = async (update = false): Promise<Peer[]> => {
   const peers: Peer[] = await Promise.all(
     peersToCheck.map(async (peer) => {
       const { node_id: nodeId, address } = peer;
-      const info = await fetchPeerInfo(peer.address.split(":")[0]);
-      return { nodeId, address, ...info };
+      return { nodeId, address, isAlive: true, uptime: '2 dni', lastAddedBlockHash: '3f33f23c11bf3bd756b69e6fc27b9da7b54abc35cf3b36ff257a388857b4ba42' };
     })
   );
+
 
   if (update) {
     console.log("Force update peer list");
   }
+
   setPeers(peers);
+
   return peers;
 };
