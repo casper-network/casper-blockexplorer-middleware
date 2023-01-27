@@ -6,6 +6,6 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - NODE_URLS=http://3.138.177.248:7777/rpc
+      - NODE_URLS=https://rpc.mainnet.casperlabs.io/rpc
     ports:
       - "4000:4000"
