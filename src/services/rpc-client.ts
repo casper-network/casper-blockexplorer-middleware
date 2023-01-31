@@ -36,7 +36,13 @@ export class RpcClient {
     const { block } = await this.rpcClient.getLatestBlockInfo();
     if (!block) throw new ApiError(StatusCodes.NOT_FOUND, "Not found block");
 
-    this.cache.set(`latestBlock`, block, BLOCK_GENERATE_INTERVAL);
+    const blockTimestamp = new Date(block.header.timestamp);
+
+    const cacheTimeInSeconds =
+      BLOCK_GENERATE_INTERVAL - (Date.now() - blockTimestamp.getTime()) / 1000;
+
+    if (cacheTimeInSeconds > 0)
+      this.cache.set(`latestBlock`, block, cacheTimeInSeconds);
 
     return block as unknown as Block;
   }
@@ -71,7 +77,7 @@ export class RpcClient {
     count = DEFAULT_PAGINATION_COUNT,
     orderByHeight = "DESC" as Sort
   ) {
-    let latestBlockHeight = (await this.getLatestBlock()).header.height;
+    const latestBlockHeight = (await this.getLatestBlock()).header.height;
 
     const fromBlock = from !== undefined ? from : latestBlockHeight;
     const targetBlock =
@@ -94,8 +100,6 @@ export class RpcClient {
     }
 
     const blocks = await Promise.all(blockPromises);
-
-    latestBlockHeight = (await this.getLatestBlock()).header.height;
 
     const total = latestBlockHeight + 1;
 
