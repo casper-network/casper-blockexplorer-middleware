@@ -77,7 +77,8 @@ export class RpcClient {
     count = DEFAULT_PAGINATION_COUNT,
     orderByHeight = "DESC" as Sort
   ) {
-    const latestBlockHeight = (await this.getLatestBlock()).header.height;
+    const latestBlock = await this.getLatestBlock();
+    const latestBlockHeight = latestBlock.header.height;
 
     const fromBlock = from !== undefined ? from : latestBlockHeight;
     const targetBlock =
@@ -103,7 +104,7 @@ export class RpcClient {
 
     const total = latestBlockHeight + 1;
 
-    return { blocks, total };
+    return { blocks, total, updated: latestBlock.header.timestamp };
   }
 
   async getDeploy(deployHash: string) {

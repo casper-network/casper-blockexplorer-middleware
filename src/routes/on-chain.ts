@@ -119,6 +119,8 @@ router.get(
  *                      type: object
  *                  count:
  *                    type: integer
+ *                  updated:
+ *                    type: string
  *    parameters:
  *    - name: from
  *      in: query
