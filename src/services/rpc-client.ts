@@ -65,17 +65,30 @@ export class RpcClient {
 
     return block as unknown as Block;
   }
-
   async getBlocks(
-    from?: number,
     count = DEFAULT_PAGINATION_COUNT,
-    orderByHeight = "DESC" as Sort
+    orderByHeight = "DESC" as Sort,
+    pageNum = 1
   ) {
     let latestBlockHeight = (await this.getLatestBlock()).header.height;
 
-    const fromBlock = from !== undefined ? from : latestBlockHeight;
-    const targetBlock =
+    const firstBlockOfPage = (pageNum - 1) * count;
+
+    const fromBlock =
+      orderByHeight === "DESC"
+        ? latestBlockHeight - firstBlockOfPage
+        : firstBlockOfPage;
+
+    let targetBlock =
       orderByHeight === "DESC" ? fromBlock - count : fromBlock + count;
+
+    if (targetBlock < 0) {
+      targetBlock = 0;
+    }
+
+    if (targetBlock > latestBlockHeight) {
+      targetBlock = latestBlockHeight;
+    }
 
     const blockPromises: Promise<Block>[] = [];
 
