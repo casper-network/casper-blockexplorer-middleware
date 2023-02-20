@@ -1,4 +1,5 @@
 import {
+  Bid,
   CasperServiceByJsonRPC,
   CLPublicKey,
   GetStatusResult,
@@ -6,6 +7,10 @@ import {
 } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
 import NodeCache from "node-cache";
+
+interface ActualBid extends Bid {
+  inactive: boolean;
+}
 
 import { BLOCK_GENERATE_INTERVAL, DEFAULT_PAGINATION_COUNT } from "../config";
 import { Sort } from "../types";
@@ -152,15 +157,13 @@ export class RpcClient {
     if (!currentEraValidators)
       throw Error(`Not found validators for era: ${latestEraId}`);
 
-    const bidsCount = validators.auction_state.bids.filter((bid) =>
-      currentEraValidators.findIndex(
-        (eraValidator) => eraValidator.public_key === bid.public_key
-      )
-    ).length;
+    const activeBids = validators.auction_state.bids.filter((validatorBid) => 
+      (validatorBid.bid as ActualBid).inactive === false
+    );
 
     return {
       validatorsCount: currentEraValidators.length,
-      bidsCount,
+      bidsCount: activeBids.length,
     };
   }
 }
