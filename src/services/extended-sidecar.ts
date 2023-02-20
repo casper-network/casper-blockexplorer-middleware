@@ -12,8 +12,8 @@ export class ExtendedSidecar extends Sidecar {
   ) {
     const blocks = [];
 
-    let latestBlockHeight = (await this.getLatestBlock()).header.height;
-
+    const latestBlock = await this.getLatestBlock();
+    const latestBlockHeight = latestBlock.header.height;
     const fromBlock = from !== undefined ? from : latestBlockHeight;
     const targetBlock =
       orderByHeight === "DESC" ? fromBlock - count : fromBlock + count;
@@ -33,10 +33,8 @@ export class ExtendedSidecar extends Sidecar {
       }
     }
 
-    latestBlockHeight = (await this.getLatestBlock()).header.height;
-
     const total = latestBlockHeight + 1;
 
-    return { blocks, total };
+    return { blocks, total, updated: latestBlock.header.timestamp };
   }
 }
