@@ -355,4 +355,12 @@ router.get(
   })
 );
 
+router.get(
+  "/current-era-validators-status",
+  catchAsync(async (req, res) => {
+    const status = await rpcClient.getCurrentEraValidatorStatus();
+    res.json(status);
+  })
+);
+
 export default router;

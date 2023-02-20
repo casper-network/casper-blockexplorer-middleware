@@ -1,11 +1,16 @@
 import {
+  Bid,
   CasperServiceByJsonRPC,
   CLPublicKey,
   GetStatusResult,
-  ValidatorWeight,
+  ValidatorsInfoResult,
 } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
 import NodeCache from "node-cache";
+
+interface ActualBid extends Bid {
+  inactive: boolean;
+}
 
 import { BLOCK_GENERATE_INTERVAL, DEFAULT_PAGINATION_COUNT } from "../config";
 import { Sort } from "../types";
@@ -133,24 +138,37 @@ export class RpcClient {
   };
 
   async getValidators() {
-    const existValidators = this.cache.get<ValidatorWeight[]>("validators");
+    const existValidators = this.cache.get<ValidatorsInfoResult>("validators");
     if (existValidators) return existValidators;
+
+    const validtorsInfo = await this.rpcClient.getValidatorsInfo();
+
+    this.cache.set("validators", validtorsInfo);
+
+    return validtorsInfo;
+  }
+
+  async getCurrentEraValidatorStatus() {
+    const validators = await this.getValidators();
 
     const {
       header: { era_id: latestEraId },
     } = await this.getLatestBlock();
 
-    const validtorsInfo = await this.rpcClient.getValidatorsInfo();
+    const currentEraValidators = validators.auction_state.era_validators.find(
+      ({ era_id }) => era_id === latestEraId
+    )?.validator_weights;
 
-    const currentEraValidators =
-      validtorsInfo.auction_state.era_validators.find(
-        ({ era_id }) => era_id === latestEraId
-      );
+    if (!currentEraValidators)
+      throw Error(`Not found validators for era: ${latestEraId}`);
 
-    const validatorWeights = currentEraValidators?.validator_weights;
+    const activeBids = validators.auction_state.bids.filter((validatorBid) => 
+      (validatorBid.bid as ActualBid).inactive === false
+    );
 
-    this.cache.set("validators", validatorWeights);
-
-    return validatorWeights;
+    return {
+      validatorsCount: currentEraValidators.length,
+      bidsCount: activeBids.length,
+    };
   }
 }
