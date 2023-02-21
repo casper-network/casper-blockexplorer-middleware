@@ -119,6 +119,8 @@ router.get(
  *                      type: object
  *                  count:
  *                    type: integer
+ *                  updated:
+ *                    type: string
  *    parameters:
  *    - name: from
  *      in: query
@@ -354,6 +356,14 @@ router.get(
   catchAsync(async (req, res) => {
     const validators = await rpcClient.getValidators();
     res.json({ validators });
+  })
+);
+
+router.get(
+  "/current-era-validators-status",
+  catchAsync(async (req, res) => {
+    const status = await rpcClient.getCurrentEraValidatorStatus();
+    res.json(status);
   })
 );
 

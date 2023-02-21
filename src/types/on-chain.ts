@@ -30,7 +30,7 @@ export interface Header {
   random_bit: boolean;
   accumulated_seed: string;
   era_end: null;
-  timestamp: Date;
+  timestamp: string;
   era_id: number;
   height: number;
   protocol_version: string;
