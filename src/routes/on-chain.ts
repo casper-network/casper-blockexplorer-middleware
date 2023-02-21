@@ -139,6 +139,7 @@ router.get(
   "/blocks",
   validate([
     query("from").optional().isInt().toInt().withMessage("Invalid number"),
+    query("pageNum").optional().isInt().toInt().withMessage("Invalid number"),
     query("count")
       .optional()
       .isInt()
@@ -154,20 +155,23 @@ router.get(
       .withMessage("Invalid order,possible asc,desc"),
   ]),
   catchAsync(async (req, res) => {
-    const { from, count, sort_by, order_by } = req.query as unknown as {
-      from?: number;
-      count: number;
-      sort_by?: string;
-      order_by?: Sort;
-    };
+    const { from, count, sort_by, order_by, pageNum } =
+      req.query as unknown as {
+        from?: number;
+        pageNum?: number;
+        count: number;
+        sort_by?: string;
+        order_by?: Sort;
+      };
 
     const orderByHeight =
       sort_by && sort_by === "height" ? order_by : undefined;
     if (SIDECAR_IS_RUNNING) {
+      // TODO: update getBlocks from sidecar when applicable
       const result = await sidecar.getBlocks(from, count, orderByHeight);
       res.json(result);
     } else {
-      const result = await rpcClient.getBlocks(from, count, orderByHeight);
+      const result = await rpcClient.getBlocks(count, orderByHeight, pageNum);
       res.json(result);
     }
   })

@@ -76,28 +76,44 @@ export class RpcClient {
 
     return block as unknown as Block;
   }
-
   async getBlocks(
-    from?: number,
     count = DEFAULT_PAGINATION_COUNT,
-    orderByHeight = "DESC" as Sort
+    orderByHeight = "DESC" as Sort,
+    pageNum = 1
   ) {
     const latestBlock = await this.getLatestBlock();
     const latestBlockHeight = latestBlock.header.height;
 
-    const fromBlock = from !== undefined ? from : latestBlockHeight;
-    const targetBlock =
+    const firstBlockOfPage = (pageNum - 1) * count;
+
+    const fromBlock =
+      orderByHeight === "DESC"
+        ? latestBlockHeight - firstBlockOfPage
+        : firstBlockOfPage;
+
+    let targetBlock =
       orderByHeight === "DESC" ? fromBlock - count : fromBlock + count;
+
+    if (targetBlock < 0) {
+      targetBlock = 0;
+    }
+
+    if (targetBlock > latestBlockHeight) {
+      targetBlock = latestBlockHeight;
+    }
 
     const blockPromises: Promise<Block>[] = [];
 
     for (
       let i = fromBlock;
-      orderByHeight === "DESC" ? i > targetBlock : i < targetBlock;
+      orderByHeight === "DESC" ? i >= targetBlock : i < targetBlock;
       orderByHeight === "DESC" ? i-- : i++
     ) {
       try {
         const block = this.getBlockByHeight(i);
+        if (blockPromises.length === count) {
+          break;
+        }
         blockPromises.push(block);
       } catch (error) {
         console.log("ERROR", error);
@@ -162,8 +178,8 @@ export class RpcClient {
     if (!currentEraValidators)
       throw Error(`Not found validators for era: ${latestEraId}`);
 
-    const activeBids = validators.auction_state.bids.filter((validatorBid) => 
-      (validatorBid.bid as ActualBid).inactive === false
+    const activeBids = validators.auction_state.bids.filter(
+      (validatorBid) => (validatorBid.bid as ActualBid).inactive === false
     );
 
     return {
