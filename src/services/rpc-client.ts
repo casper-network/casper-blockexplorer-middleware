@@ -94,11 +94,14 @@ export class RpcClient {
 
     for (
       let i = fromBlock;
-      orderByHeight === "DESC" ? i > targetBlock : i < targetBlock;
+      orderByHeight === "DESC" ? i >= targetBlock : i < targetBlock;
       orderByHeight === "DESC" ? i-- : i++
     ) {
       try {
         const block = this.getBlockByHeight(i);
+        if (blockPromises.length === count) {
+          break;
+        }
         blockPromises.push(block);
       } catch (error) {
         console.log("ERROR", error);
