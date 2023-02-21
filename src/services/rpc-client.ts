@@ -82,7 +82,7 @@ export class RpcClient {
     pageNum = 1
   ) {
     const latestBlock = await this.getLatestBlock();
-    let latestBlockHeight = latestBlock.header.height;
+    const latestBlockHeight = latestBlock.header.height;
 
     const firstBlockOfPage = (pageNum - 1) * count;
 
