@@ -352,9 +352,9 @@ router.get(
 );
 
 router.get(
-  "/validators",
+  "/current-era-validators",
   catchAsync(async (req, res) => {
-    const validators = await rpcClient.getValidators();
+    const validators = await rpcClient.getCurrentEraValidators();
     res.json({ validators });
   })
 );
