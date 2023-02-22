@@ -15,7 +15,7 @@ interface ActualBid extends Bid {
 
 import { BLOCK_GENERATE_INTERVAL, DEFAULT_PAGINATION_COUNT } from "../config";
 import { Sort } from "../types";
-import { Block } from "../types/on-chain";
+import { Block, ValidatorInfo } from "../types/on-chain";
 import { ApiError, isValidPublicKey } from "../utils";
 
 export class RpcClient {
@@ -155,10 +155,8 @@ export class RpcClient {
   };
 
   async getCurrentEraValidators() {
-    const cachedValidatorsInfo = this.cache.get<{
-      activeValidators: ValidatorWeight[];
-      activeBids: ValidatorBid[];
-    }>("validatorsInfo");
+    const cachedValidatorsInfo =
+      this.cache.get<ValidatorInfo>("validatorsInfo");
 
     if (cachedValidatorsInfo) return cachedValidatorsInfo;
 
@@ -188,15 +186,10 @@ export class RpcClient {
   }
 
   async getCurrentEraValidatorStatus() {
-    let currentValidatorsInfo: {
-      activeValidators: ValidatorWeight[];
-      activeBids: ValidatorBid[];
-    };
+    let currentValidatorsInfo: ValidatorInfo;
 
-    const cachedValidatorsInfo = this.cache.get<{
-      activeValidators: ValidatorWeight[];
-      activeBids: ValidatorBid[];
-    }>("validatorsInfo");
+    const cachedValidatorsInfo =
+      this.cache.get<ValidatorInfo>("validatorsInfo");
 
     if (cachedValidatorsInfo) {
       currentValidatorsInfo = cachedValidatorsInfo;
