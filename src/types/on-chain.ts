@@ -1,4 +1,9 @@
-import { ExecutionResult, JsonHeader as DeployAccepted } from "casper-js-sdk";
+import {
+  ExecutionResult,
+  JsonHeader as DeployAccepted,
+  ValidatorBid,
+  ValidatorWeight,
+} from "casper-js-sdk";
 export { JsonHeader as DeployAccepted } from "casper-js-sdk";
 export interface GetBlock {
   block_hash: string;
@@ -51,4 +56,9 @@ export interface DeployProcessed {
   dependencies: unknown[];
   block_hash: string;
   execution_result: ExecutionResult;
+}
+
+export interface ValidatorInfo {
+  activeValidators: ValidatorWeight[];
+  activeBids: ValidatorBid[];
 }

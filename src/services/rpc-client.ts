@@ -3,7 +3,8 @@ import {
   CasperServiceByJsonRPC,
   CLPublicKey,
   GetStatusResult,
-  ValidatorsInfoResult,
+  ValidatorBid,
+  ValidatorWeight,
 } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
 import NodeCache from "node-cache";
@@ -14,7 +15,7 @@ interface ActualBid extends Bid {
 
 import { BLOCK_GENERATE_INTERVAL, DEFAULT_PAGINATION_COUNT } from "../config";
 import { Sort } from "../types";
-import { Block } from "../types/on-chain";
+import { Block, ValidatorInfo } from "../types/on-chain";
 import { ApiError, isValidPublicKey } from "../utils";
 
 export class RpcClient {
@@ -153,38 +154,52 @@ export class RpcClient {
     return account;
   };
 
-  async getValidators() {
-    const existValidators = this.cache.get<ValidatorsInfoResult>("validators");
-    if (existValidators) return existValidators;
+  async getCurrentEraValidators() {
+    const cachedValidatorsInfo =
+      this.cache.get<ValidatorInfo>("validatorsInfo");
 
-    const validtorsInfo = await this.rpcClient.getValidatorsInfo();
+    if (cachedValidatorsInfo) return cachedValidatorsInfo;
 
-    this.cache.set("validators", validtorsInfo);
-
-    return validtorsInfo;
-  }
-
-  async getCurrentEraValidatorStatus() {
-    const validators = await this.getValidators();
+    const validatorsInfo = await this.rpcClient.getValidatorsInfo();
 
     const {
       header: { era_id: latestEraId },
     } = await this.getLatestBlock();
 
-    const currentEraValidators = validators.auction_state.era_validators.find(
-      ({ era_id }) => era_id === latestEraId
-    )?.validator_weights;
+    const activeValidators =
+      validatorsInfo.auction_state.era_validators.find(
+        ({ era_id }) => era_id === latestEraId
+      )?.validator_weights ?? [];
 
-    if (!currentEraValidators)
-      throw Error(`Not found validators for era: ${latestEraId}`);
-
-    const activeBids = validators.auction_state.bids.filter(
+    const activeBids = validatorsInfo.auction_state.bids.filter(
       (validatorBid) => (validatorBid.bid as ActualBid).inactive === false
     );
 
+    const currentValidatorsInfo = {
+      activeValidators,
+      activeBids,
+    };
+
+    this.cache.set("validatorsInfo", currentValidatorsInfo);
+
+    return currentValidatorsInfo;
+  }
+
+  async getCurrentEraValidatorStatus() {
+    let currentValidatorsInfo: ValidatorInfo;
+
+    const cachedValidatorsInfo =
+      this.cache.get<ValidatorInfo>("validatorsInfo");
+
+    if (cachedValidatorsInfo) {
+      currentValidatorsInfo = cachedValidatorsInfo;
+    } else {
+      currentValidatorsInfo = await this.getCurrentEraValidators();
+    }
+
     return {
-      validatorsCount: currentEraValidators.length,
-      bidsCount: activeBids.length,
+      validatorsCount: currentValidatorsInfo.activeValidators.length,
+      bidsCount: currentValidatorsInfo.activeBids.length,
     };
   }
 }
