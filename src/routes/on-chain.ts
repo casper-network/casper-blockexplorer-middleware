@@ -354,8 +354,13 @@ router.get(
 router.get(
   "/current-era-validators",
   validate([
-    query("pageNum").isInt().toInt().withMessage("Invalid number"),
-    query("count").isInt().toInt().default(10).withMessage("Invalid number"),
+    query("pageNum").optional().isInt().toInt().withMessage("Invalid number"),
+    query("count")
+      .optional()
+      .isInt()
+      .toInt()
+      .default(10)
+      .withMessage("Invalid number"),
     query("sort_by").optional().isString(),
     query("order_by")
       .optional()
