@@ -3,8 +3,6 @@ import {
   CasperServiceByJsonRPC,
   CLPublicKey,
   GetStatusResult,
-  ValidatorBid,
-  ValidatorWeight,
 } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
 import NodeCache from "node-cache";
