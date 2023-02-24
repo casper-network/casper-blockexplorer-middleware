@@ -3,8 +3,6 @@ import {
   CasperServiceByJsonRPC,
   CLPublicKey,
   GetStatusResult,
-  ValidatorBid,
-  ValidatorWeight,
 } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
 import NodeCache from "node-cache";
@@ -17,6 +15,7 @@ import { BLOCK_GENERATE_INTERVAL, DEFAULT_PAGINATION_COUNT } from "../config";
 import { Sort } from "../types";
 import { Block, ValidatorInfo } from "../types/on-chain";
 import { ApiError, isValidPublicKey } from "../utils";
+import { paginateValidators } from "./utils";
 
 export class RpcClient {
   private cache: NodeCache;
@@ -154,11 +153,13 @@ export class RpcClient {
     return account;
   };
 
-  async getCurrentEraValidators() {
+  async getCurrentEraValidators(count?: number, pageNum?: number) {
     const cachedValidatorsInfo =
       this.cache.get<ValidatorInfo>("validatorsInfo");
 
-    if (cachedValidatorsInfo) return cachedValidatorsInfo;
+    if (cachedValidatorsInfo) {
+      return paginateValidators(cachedValidatorsInfo, count, pageNum);
+    }
 
     const validatorsInfo = await this.rpcClient.getValidatorsInfo();
 
@@ -182,7 +183,7 @@ export class RpcClient {
 
     this.cache.set("validatorsInfo", currentValidatorsInfo);
 
-    return currentValidatorsInfo;
+    return paginateValidators(currentValidatorsInfo, count, pageNum);
   }
 
   async getCurrentEraValidatorStatus() {

@@ -353,8 +353,29 @@ router.get(
 
 router.get(
   "/current-era-validators",
+  validate([
+    query("pageNum").optional().isInt().toInt().withMessage("Invalid number"),
+    query("count")
+      .optional()
+      .isInt()
+      .toInt()
+      .default(10)
+      .withMessage("Invalid number"),
+    query("sort_by").optional().isString(),
+    query("order_by")
+      .optional()
+      .isString()
+      .toUpperCase()
+      .isIn(["ASC", "DESC"])
+      .withMessage("Invalid order,possible asc,desc"),
+  ]),
   catchAsync(async (req, res) => {
-    const validators = await rpcClient.getCurrentEraValidators();
+    const { count, pageNum } = req.query as unknown as {
+      pageNum: number;
+      count: number;
+    };
+
+    const validators = await rpcClient.getCurrentEraValidators(count, pageNum);
     res.json({ validators });
   })
 );
