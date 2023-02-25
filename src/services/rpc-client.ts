@@ -7,7 +7,7 @@ import {
 import { StatusCodes } from "http-status-codes";
 import NodeCache from "node-cache";
 
-interface ActualBid extends Bid {
+export interface ActualBid extends Bid {
   inactive: boolean;
 }
 

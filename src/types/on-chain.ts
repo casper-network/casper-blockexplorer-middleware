@@ -62,3 +62,19 @@ export interface ValidatorInfo {
   activeValidators: ValidatorWeight[];
   activeBids: ValidatorBid[];
 }
+
+export interface ValidatorsProcessed {
+  validators: {
+    rank: number;
+    publicKey: string;
+    feePercentage: number;
+    delegatorsCount: number;
+    totalStakeCspr: number;
+    selfPercentage: number;
+    percentageOfNetwork: number;
+  };
+  status: {
+    activeValidatorsCount: number;
+    activeBidsCount: number;
+  };
+}
