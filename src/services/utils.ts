@@ -48,7 +48,7 @@ export const processValidatorsInfoResult = (
     const totalStakeCspr = parseInt(validator.weight, 10);
 
     processedValidator.publicKey = validator.public_key;
-    processedValidator.totalStakeCspr = totalStakeCspr;
+    processedValidator.totalStakeCspr = Math.round(totalStakeCspr / 10 ** 9);
 
     const associatedBid = activeBids.find(
       (bid) => bid.public_key === validator.public_key
@@ -57,10 +57,15 @@ export const processValidatorsInfoResult = (
     if (associatedBid) {
       processedValidator.feePercentage = associatedBid.bid.delegation_rate;
       processedValidator.delegatorsCount = associatedBid.bid.delegators.length;
-      processedValidator.selfPercentage =
-        (parseInt(associatedBid.bid.staked_amount, 10) / totalStakeCspr) * 100;
-      processedValidator.percentageOfNetwork =
-        (totalStakeCspr / totalActiveValidatorsStake) * 100;
+      processedValidator.selfPercentage = Number(
+        (
+          (parseInt(associatedBid.bid.staked_amount, 10) / totalStakeCspr) *
+          100
+        ).toFixed(2)
+      );
+      processedValidator.percentageOfNetwork = Number(
+        ((totalStakeCspr / totalActiveValidatorsStake) * 100).toFixed(2)
+      );
     }
 
     processedValidators.push(processedValidator);
