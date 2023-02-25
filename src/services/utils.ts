@@ -7,14 +7,14 @@ import {
 import { ActualBid } from "./rpc-client";
 
 export const paginateValidators = (
-  validatorsInfo: ValidatorInfo,
+  validatorsInfo: ValidatorsProcessedWithStatus,
   count?: number,
   pageSize?: number
-): ValidatorInfo => {
+): ValidatorsProcessedWithStatus => {
   if (count && pageSize) {
     return {
       ...validatorsInfo,
-      activeValidators: validatorsInfo.activeValidators.slice(
+      validators: validatorsInfo.validators.slice(
         (pageSize - 1) * count,
         pageSize * count
       ),
@@ -80,5 +80,5 @@ export const processValidatorsInfoResult = (
       activeValidatorsCount: activeValidators.length,
       activeBidsCount: activeBids.length,
     },
-  } as ValidatorsProcessedWithStatus;
+  };
 };
