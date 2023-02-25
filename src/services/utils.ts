@@ -1,6 +1,6 @@
 import { ValidatorsInfoResult } from "casper-js-sdk";
+
 import {
-  ValidatorInfo,
   ValidatorProcessed,
   ValidatorsProcessedWithStatus,
 } from "../types/on-chain";
@@ -42,7 +42,7 @@ export const processValidatorsInfoResult = (
     0
   );
 
-  let processedValidators: ValidatorsProcessedWithStatus["validators"] = [];
+  const processedValidators: ValidatorsProcessedWithStatus["validators"] = [];
   for (const validator of activeValidators) {
     const processedValidator = {} as ValidatorProcessed;
     const totalStakeCspr = parseInt(validator.weight, 10);

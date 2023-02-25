@@ -7,20 +7,15 @@ import {
 import { StatusCodes } from "http-status-codes";
 import NodeCache from "node-cache";
 
-export interface ActualBid extends Bid {
-  inactive: boolean;
-}
-
 import { BLOCK_GENERATE_INTERVAL, DEFAULT_PAGINATION_COUNT } from "../config";
 import { Sort } from "../types";
-import {
-  Block,
-  ValidatorInfo,
-  ValidatorsProcessedWithStatus,
-} from "../types/on-chain";
+import { Block, ValidatorsProcessedWithStatus } from "../types/on-chain";
 import { ApiError, isValidPublicKey } from "../utils";
 import { paginateValidators, processValidatorsInfoResult } from "./utils";
 
+export interface ActualBid extends Bid {
+  inactive: boolean;
+}
 export class RpcClient {
   private cache: NodeCache;
   constructor(private readonly rpcClient: CasperServiceByJsonRPC) {
