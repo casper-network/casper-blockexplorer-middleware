@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  casper-blockexplorer-middleware-cicd:
+    image: casper-blockexplorer-middleware
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile.dev
+    environment:
+      - NODE_URLS
+    ports:
+      - "4000:4000"

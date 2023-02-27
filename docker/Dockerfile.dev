@@ -1,0 +1,12 @@
+FROM node:16.14.0-alpine
+
+ENV NODE_ENV "development"
+
+COPY app /app
+WORKDIR /app
+
+RUN npm install
+
+CMD npm run dev
+
+EXPOSE 4000
