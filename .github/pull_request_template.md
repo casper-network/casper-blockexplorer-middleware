@@ -1,7 +1,5 @@
 ### 🔥 Summary
 
-### 📹 Video
-
 ### 😤 Problem / Goals
 -
 
