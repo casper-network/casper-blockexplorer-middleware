@@ -45,10 +45,10 @@ export const processValidatorsInfoResult = (
   const processedValidators: ValidatorsProcessedWithStatus["validators"] = [];
   for (const validator of activeValidators) {
     const processedValidator = {} as ValidatorProcessed;
-    const totalStakeCspr = parseInt(validator.weight, 10);
+    const totalStakeMotes = parseInt(validator.weight, 10);
 
     processedValidator.publicKey = validator.public_key;
-    processedValidator.totalStakeCspr = Math.round(totalStakeCspr / 10 ** 9);
+    processedValidator.totalStakeMotes = totalStakeMotes;
 
     const associatedBid = activeBids.find(
       (bid) => bid.public_key === validator.public_key
@@ -59,12 +59,12 @@ export const processValidatorsInfoResult = (
       processedValidator.delegatorsCount = associatedBid.bid.delegators.length;
       processedValidator.selfPercentage = Number(
         (
-          (parseInt(associatedBid.bid.staked_amount, 10) / totalStakeCspr) *
+          (parseInt(associatedBid.bid.staked_amount, 10) / totalStakeMotes) *
           100
         ).toFixed(2)
       );
       processedValidator.percentageOfNetwork = Number(
-        ((totalStakeCspr / totalActiveValidatorsStake) * 100).toFixed(2)
+        ((totalStakeMotes / totalActiveValidatorsStake) * 100).toFixed(2)
       );
     }
 
@@ -72,7 +72,7 @@ export const processValidatorsInfoResult = (
   }
 
   // ranking
-  processedValidators.sort((a, b) => b.totalStakeCspr - a.totalStakeCspr);
+  processedValidators.sort((a, b) => b.totalStakeMotes - a.totalStakeMotes);
   let rank = 1;
   processedValidators.forEach((_, index) => {
     processedValidators[index].rank = rank;

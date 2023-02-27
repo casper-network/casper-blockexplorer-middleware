@@ -68,7 +68,7 @@ export interface ValidatorProcessed {
   publicKey: string;
   feePercentage: number;
   delegatorsCount: number;
-  totalStakeCspr: number;
+  totalStakeMotes: number;
   selfPercentage: number;
   percentageOfNetwork: number;
 }
