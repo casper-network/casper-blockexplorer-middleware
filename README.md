@@ -1,8 +1,24 @@
 # Blockexplorer Middleware
 
-Middleware was written by Express.js and Typescript.
+### Setup
 
-## Test
+Docker and Docker Compose must be set and running before the following steps:
+
+1. Create a `.env` file in the root of the project.
+
+Example:
+```
+PORT=4000
+NODE_URLS=https://rpc.mainnet.casperlabs.io/rpc
+SIDECAR_REST_URL=<optional>
+SIDECAR_EVENTSTREAM_URL=<optional>
+```
+
+2. Run `make prod-build` or `make dev-build` if you are using the app for development purposes (HMR and debug modes will be enabled).
+3. Run `make prod-start` if you are using the app for production (optimized builds) or `make dev-start` for development. 
+4. The middleware will be running at port `4000` or different if `PORT` was set in `.env`. 
+
+## Testing
 We use mocha for unit test and e2e test.
 
 - Unit test files are named like *.spec.ts.
@@ -21,11 +37,5 @@ We use mocha for unit test and e2e test.
   npm run test:e2e
   ```
 
-## Development
-You can test apis via Swagger UI. Start development server by run 
-
-```bash
-npm run dev
-```
-
-and access `http://localhost:<PORT>/docs`.
+## Swagger Docs
+Start development server and access `http://localhost:<PORT>/docs`.
