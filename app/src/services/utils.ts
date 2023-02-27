@@ -82,8 +82,9 @@ export const processValidatorsInfoResult = (
   return {
     validators: processedValidators,
     status: {
-      activeValidatorsCount: activeValidators.length,
-      activeBidsCount: activeBids.length,
+      validatorsCount: activeValidators.length,
+      bidsCount: activeBids.length,
+      latestEraId,
     },
   };
 };

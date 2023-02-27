@@ -157,15 +157,18 @@ export class RpcClient {
       "processedValidatorsWithStatus"
     );
 
-    if (cachedValidatorsInfo) {
+    const {
+      header: { era_id: latestEraId },
+    } = await this.getLatestBlock();
+
+    if (
+      cachedValidatorsInfo &&
+      latestEraId === cachedValidatorsInfo.status.latestEraId
+    ) {
       return paginateValidators(cachedValidatorsInfo, count, pageNum);
     }
 
     const validatorsInfo = await this.rpcClient.getValidatorsInfo();
-
-    const {
-      header: { era_id: latestEraId },
-    } = await this.getLatestBlock();
 
     const processedValidatorsWithStatus = processValidatorsInfoResult(
       validatorsInfo,
@@ -187,15 +190,22 @@ export class RpcClient {
       "processedValidatorsWithStatus"
     );
 
-    if (cachedValidatorsInfo) {
+    const {
+      header: { era_id: latestEraId },
+    } = await this.getLatestBlock();
+
+    if (
+      cachedValidatorsInfo &&
+      latestEraId === cachedValidatorsInfo.status.latestEraId
+    ) {
       currentValidatorsInfo = cachedValidatorsInfo;
     } else {
       currentValidatorsInfo = await this.getCurrentEraValidators();
     }
 
     return {
-      validatorsCount: currentValidatorsInfo.status.activeValidatorsCount,
-      bidsCount: currentValidatorsInfo.status.activeBidsCount,
+      validatorsCount: currentValidatorsInfo.status.validatorsCount,
+      bidsCount: currentValidatorsInfo.status.bidsCount,
     };
   }
 }
