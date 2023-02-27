@@ -7,16 +7,15 @@ import {
 import { StatusCodes } from "http-status-codes";
 import NodeCache from "node-cache";
 
-interface ActualBid extends Bid {
-  inactive: boolean;
-}
-
 import { BLOCK_GENERATE_INTERVAL, DEFAULT_PAGINATION_COUNT } from "../config";
 import { Sort } from "../types";
-import { Block, ValidatorInfo } from "../types/on-chain";
+import { Block, ValidatorsProcessedWithStatus } from "../types/on-chain";
 import { ApiError, isValidPublicKey } from "../utils";
-import { paginateValidators } from "./utils";
+import { paginateValidators, processValidatorsInfoResult } from "./utils";
 
+export interface ActualBid extends Bid {
+  inactive: boolean;
+}
 export class RpcClient {
   private cache: NodeCache;
   constructor(private readonly rpcClient: CasperServiceByJsonRPC) {
@@ -154,8 +153,9 @@ export class RpcClient {
   };
 
   async getCurrentEraValidators(count?: number, pageNum?: number) {
-    const cachedValidatorsInfo =
-      this.cache.get<ValidatorInfo>("validatorsInfo");
+    const cachedValidatorsInfo = this.cache.get<ValidatorsProcessedWithStatus>(
+      "processedValidatorsWithStatus"
+    );
 
     if (cachedValidatorsInfo) {
       return paginateValidators(cachedValidatorsInfo, count, pageNum);
@@ -167,30 +167,25 @@ export class RpcClient {
       header: { era_id: latestEraId },
     } = await this.getLatestBlock();
 
-    const activeValidators =
-      validatorsInfo.auction_state.era_validators.find(
-        ({ era_id }) => era_id === latestEraId
-      )?.validator_weights ?? [];
-
-    const activeBids = validatorsInfo.auction_state.bids.filter(
-      (validatorBid) => (validatorBid.bid as ActualBid).inactive === false
+    const processedValidatorsWithStatus = processValidatorsInfoResult(
+      validatorsInfo,
+      latestEraId
     );
 
-    const currentValidatorsInfo = {
-      activeValidators,
-      activeBids,
-    };
+    this.cache.set(
+      "processedValidatorsWithStatus",
+      processedValidatorsWithStatus
+    );
 
-    this.cache.set("validatorsInfo", currentValidatorsInfo);
-
-    return paginateValidators(currentValidatorsInfo, count, pageNum);
+    return paginateValidators(processedValidatorsWithStatus, count, pageNum);
   }
 
   async getCurrentEraValidatorStatus() {
-    let currentValidatorsInfo: ValidatorInfo;
+    let currentValidatorsInfo: ValidatorsProcessedWithStatus;
 
-    const cachedValidatorsInfo =
-      this.cache.get<ValidatorInfo>("validatorsInfo");
+    const cachedValidatorsInfo = this.cache.get<ValidatorsProcessedWithStatus>(
+      "processedValidatorsWithStatus"
+    );
 
     if (cachedValidatorsInfo) {
       currentValidatorsInfo = cachedValidatorsInfo;
@@ -199,8 +194,8 @@ export class RpcClient {
     }
 
     return {
-      validatorsCount: currentValidatorsInfo.activeValidators.length,
-      bidsCount: currentValidatorsInfo.activeBids.length,
+      validatorsCount: currentValidatorsInfo.status.activeValidatorsCount,
+      bidsCount: currentValidatorsInfo.status.activeBidsCount,
     };
   }
 }
