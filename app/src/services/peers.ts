@@ -20,10 +20,14 @@ export const fetchPeerInfo = async (ip: string) => {
 
     // TODO: Update SDK type
     // @ts-ignore
-    const { uptime, last_added_block_info: lastAddedBlockInfo } = await rpc.getStatus();
+    const { uptime, last_added_block_info: lastAddedBlockInfo } =
+      await rpc.getStatus();
 
-
-    return { uptime, isAlive: true, lastAddedBlockHash: lastAddedBlockInfo.hash };
+    return {
+      uptime,
+      isAlive: true,
+      lastAddedBlockHash: lastAddedBlockInfo.hash,
+    };
   } catch (error) {
     console.error(`Peer ${ip}:`, error);
     return { uptime: null, isAlive: false, lastAddedBlockHash: null };
@@ -33,6 +37,7 @@ export const fetchPeerInfo = async (ip: string) => {
 export const fetchPeers = async (update = false): Promise<Peer[]> => {
   const rpcCall = async () => {
     const activeNode = nodeManager.getActiveNode();
+
     try {
       const node = new CasperServiceByJsonRPC(activeNode.url);
       const { peers } = await node.getPeers();
@@ -56,7 +61,6 @@ export const fetchPeers = async (update = false): Promise<Peer[]> => {
       return { nodeId, address };
     })
   );
-
 
   if (update) {
     console.log("Force update peer list");

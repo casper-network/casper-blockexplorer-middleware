@@ -7,6 +7,7 @@ import swaggerUi from "swagger-ui-express";
 import { NODE_ENV } from "../config";
 import { errorConverter, errorHandler, validate } from "../middlewares";
 import { fetchPeers, nodeManager } from "../services";
+import { paginatePeers } from "../services/utils";
 import openapiSpecification, { uiOptions } from "../swagger";
 import { ApiError, catchAsync } from "../utils";
 import onChainRoutes from "./on-chain";
@@ -41,7 +42,7 @@ router.use("/rpc", (req, res) => {
       .post(node.url, req.body)
       .then((nodeRes) => res.json(nodeRes.data))
       .catch((err) => {
-        console.log('>>>>>setDeadNode', err);
+        console.log(">>>>>setDeadNode", err);
         // nodeManager.setDeadNode(node.id);
         rpcCall();
       });
@@ -83,11 +84,26 @@ router.use("/rpc", (req, res) => {
  */
 router.get(
   "/peers",
-  validate([query("update").optional().isBoolean().toBoolean()]),
+  validate([
+    query("update").optional().isBoolean().toBoolean(),
+    query("pageNum").optional().isInt().toInt().withMessage("Invalid number"),
+    query("count")
+      .optional()
+      .isInt()
+      .toInt()
+      .default(10)
+      .withMessage("Invalid number"),
+  ]),
   catchAsync(async (req, res) => {
+    const { count, pageNum } = req.query as unknown as {
+      pageNum: number;
+      count: number;
+    };
     const update = req.query.update as unknown as boolean | undefined;
     const result = await fetchPeers(update);
-    res.json({ result });
+
+    const paginatedResult = paginatePeers(result, count, pageNum);
+    res.json({ paginatedResult });
   })
 );
 
