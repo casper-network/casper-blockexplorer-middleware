@@ -361,8 +361,8 @@ router.get(
       .toInt()
       .default(10)
       .withMessage("Invalid number"),
-    query("sort_by").optional().isString(),
-    query("order_by")
+    query("sortBy").optional().isString(),
+    query("orderBy")
       .optional()
       .isString()
       .toUpperCase()
@@ -370,12 +370,19 @@ router.get(
       .withMessage("Invalid order,possible asc,desc"),
   ]),
   catchAsync(async (req, res) => {
-    const { count, pageNum } = req.query as unknown as {
+    const { count, pageNum, orderBy, sortBy } = req.query as unknown as {
       pageNum: number;
       count: number;
+      orderBy: Sort;
+      sortBy: string;
     };
 
-    const validators = await rpcClient.getCurrentEraValidators(count, pageNum);
+    const validators = await rpcClient.getCurrentEraValidators(
+      count,
+      pageNum,
+      sortBy,
+      orderBy
+    );
     res.json({ validators });
   })
 );
