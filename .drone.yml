@@ -21,6 +21,8 @@ steps:
 
   - name: npm test
     image: casperlabs/node-build-u1804
+    environment:
+      NODE_URLS: 'https://rpc.testnet.casperlabs.io/rpc'
     commands:
       - make middleware-test
 
@@ -50,6 +52,8 @@ steps:
 
   - name: npm test
     image: casperlabs/node-build-u1804
+    environment:
+      NODE_URLS: 'https://rpc.testnet.casperlabs.io/rpc'
     commands:
       - make middleware-test
 
