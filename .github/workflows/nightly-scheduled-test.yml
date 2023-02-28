@@ -36,6 +36,8 @@ jobs:
 
       - name: Test
         run: make middleware-test
+        env:
+          NODE_URLS: https://rpc.testnet.casperlabs.io/rpc
 
       - name: Slack Notification
         uses: ravsamhq/notify-slack-action@4ed28566c2bdcdaee6dca2b46b9666d01b4ed8a4 #v1.10.0

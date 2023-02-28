@@ -47,3 +47,5 @@ jobs:
 
       - name: Test
         run: make middleware-test
+        env:
+          NODE_URLS: https://rpc.testnet.casperlabs.io/rpc
