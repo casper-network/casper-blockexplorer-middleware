@@ -32,11 +32,16 @@ export const sortValidators = (
 ) => {
   if (sortBy && orderBy) {
     validatorsInfo.validators.sort((a, b) => {
-      if (a["totalStakeMotes"] < b["totalStakeMotes"]) {
+      // @ts-ignore - TS can't infer if property in obj
+      const firstAccessor = sortBy in a ? a[sortBy] : a["totalStakeMotes"];
+      // @ts-ignore
+      const secondAccessor = sortBy in b ? b[sortBy] : b["totalStakeMotes"];
+
+      if (firstAccessor < secondAccessor) {
         return orderBy === "DESC" ? 1 : -1;
       }
 
-      if (a["totalStakeMotes"] > b["totalStakeMotes"]) {
+      if (firstAccessor > secondAccessor) {
         return orderBy === "DESC" ? -1 : 1;
       }
 
