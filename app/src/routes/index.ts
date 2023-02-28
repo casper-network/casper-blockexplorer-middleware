@@ -101,9 +101,11 @@ router.get(
     };
     const update = req.query.update as unknown as boolean | undefined;
     const result = await fetchPeers(update);
+    const totalPeers = result.length;
 
     const paginatedResult = paginatePeers(result, count, pageNum);
-    res.json({ paginatedResult });
+
+    res.json({ paginatedResult, totalPeers });
   })
 );
 
