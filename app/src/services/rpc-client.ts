@@ -9,9 +9,17 @@ import NodeCache from "node-cache";
 
 import { BLOCK_GENERATE_INTERVAL, DEFAULT_PAGINATION_COUNT } from "../config";
 import { Sort } from "../types";
-import { Block, ValidatorsProcessedWithStatus } from "../types/on-chain";
+import {
+  Block,
+  ValidatorProcessed,
+  ValidatorsProcessedWithStatus,
+} from "../types/on-chain";
 import { ApiError, isValidPublicKey } from "../utils";
-import { paginateValidators, processValidatorsInfoResult } from "./utils";
+import {
+  paginateValidators,
+  processValidatorsInfoResult,
+  sortValidators,
+} from "./utils";
 
 export interface ActualBid extends Bid {
   inactive: boolean;
@@ -152,7 +160,12 @@ export class RpcClient {
     return account;
   };
 
-  async getCurrentEraValidators(count?: number, pageNum?: number) {
+  async getCurrentEraValidators(
+    count?: number,
+    pageNum?: number,
+    sortBy?: keyof ValidatorProcessed,
+    orderBy?: Sort
+  ) {
     const cachedValidatorsInfo = this.cache.get<ValidatorsProcessedWithStatus>(
       "processedValidatorsWithStatus"
     );
@@ -165,7 +178,13 @@ export class RpcClient {
       cachedValidatorsInfo &&
       latestEraId === cachedValidatorsInfo.status.latestEraId
     ) {
-      return paginateValidators(cachedValidatorsInfo, count, pageNum);
+      const sortedValidatorsInfo = sortValidators(
+        cachedValidatorsInfo,
+        sortBy,
+        orderBy
+      );
+
+      return paginateValidators(sortedValidatorsInfo, count, pageNum);
     }
 
     const validatorsInfo = await this.rpcClient.getValidatorsInfo();
@@ -180,7 +199,13 @@ export class RpcClient {
       processedValidatorsWithStatus
     );
 
-    return paginateValidators(processedValidatorsWithStatus, count, pageNum);
+    const sortedValidatorsInfo = sortValidators(
+      processedValidatorsWithStatus,
+      sortBy,
+      orderBy
+    );
+
+    return paginateValidators(sortedValidatorsInfo, count, pageNum);
   }
 
   async getCurrentEraValidatorStatus() {

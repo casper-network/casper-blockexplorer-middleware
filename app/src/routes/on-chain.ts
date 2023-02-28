@@ -7,7 +7,7 @@ import { PORT, SIDECAR_IS_RUNNING, SIDECAR_REST_URL } from "../config";
 import { validate } from "../middlewares";
 import { ExtendedSidecar, RpcClient } from "../services";
 import { Sort } from "../types";
-import { GetDeploy } from "../types/on-chain";
+import { GetDeploy, ValidatorProcessed } from "../types/on-chain";
 import { ApiError, catchAsync, isValidHash, isValidPublicKey } from "../utils";
 
 const router = express.Router();
@@ -361,8 +361,8 @@ router.get(
       .toInt()
       .default(10)
       .withMessage("Invalid number"),
-    query("sort_by").optional().isString(),
-    query("order_by")
+    query("sortBy").optional().isString(),
+    query("orderBy")
       .optional()
       .isString()
       .toUpperCase()
@@ -370,12 +370,19 @@ router.get(
       .withMessage("Invalid order,possible asc,desc"),
   ]),
   catchAsync(async (req, res) => {
-    const { count, pageNum } = req.query as unknown as {
+    const { count, pageNum, orderBy, sortBy } = req.query as unknown as {
       pageNum: number;
       count: number;
+      orderBy: Sort;
+      sortBy: keyof ValidatorProcessed;
     };
 
-    const validators = await rpcClient.getCurrentEraValidators(count, pageNum);
+    const validators = await rpcClient.getCurrentEraValidators(
+      count,
+      pageNum,
+      sortBy,
+      orderBy
+    );
     res.json({ validators });
   })
 );
