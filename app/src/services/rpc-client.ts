@@ -9,7 +9,11 @@ import NodeCache from "node-cache";
 
 import { BLOCK_GENERATE_INTERVAL, DEFAULT_PAGINATION_COUNT } from "../config";
 import { Sort } from "../types";
-import { Block, ValidatorsProcessedWithStatus } from "../types/on-chain";
+import {
+  Block,
+  ValidatorProcessed,
+  ValidatorsProcessedWithStatus,
+} from "../types/on-chain";
 import { ApiError, isValidPublicKey } from "../utils";
 import {
   paginateValidators,
@@ -159,7 +163,7 @@ export class RpcClient {
   async getCurrentEraValidators(
     count?: number,
     pageNum?: number,
-    sortBy?: string,
+    sortBy?: keyof ValidatorProcessed,
     orderBy?: Sort
   ) {
     const cachedValidatorsInfo = this.cache.get<ValidatorsProcessedWithStatus>(

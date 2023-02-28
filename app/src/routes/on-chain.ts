@@ -7,7 +7,7 @@ import { PORT, SIDECAR_IS_RUNNING, SIDECAR_REST_URL } from "../config";
 import { validate } from "../middlewares";
 import { ExtendedSidecar, RpcClient } from "../services";
 import { Sort } from "../types";
-import { GetDeploy } from "../types/on-chain";
+import { GetDeploy, ValidatorProcessed } from "../types/on-chain";
 import { ApiError, catchAsync, isValidHash, isValidPublicKey } from "../utils";
 
 const router = express.Router();
@@ -374,7 +374,7 @@ router.get(
       pageNum: number;
       count: number;
       orderBy: Sort;
-      sortBy: string;
+      sortBy: keyof ValidatorProcessed;
     };
 
     const validators = await rpcClient.getCurrentEraValidators(

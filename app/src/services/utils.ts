@@ -27,14 +27,13 @@ export const paginateValidators = (
 
 export const sortValidators = (
   validatorsInfo: ValidatorsProcessedWithStatus,
-  sortBy?: string,
+  sortBy?: keyof ValidatorProcessed,
   orderBy?: Sort
 ) => {
   if (sortBy && orderBy) {
     validatorsInfo.validators.sort((a, b) => {
-      // @ts-ignore - TS can't infer if property in obj
       const firstAccessor = sortBy in a ? a[sortBy] : a["totalStakeMotes"];
-      // @ts-ignore
+
       const secondAccessor = sortBy in b ? b[sortBy] : b["totalStakeMotes"];
 
       if (firstAccessor < secondAccessor) {
