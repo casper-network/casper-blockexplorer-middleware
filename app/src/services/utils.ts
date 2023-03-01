@@ -1,5 +1,5 @@
 import { ValidatorsInfoResult } from "casper-js-sdk";
-import { Peer } from "../types";
+import { Peer, Sort } from "../types";
 
 import {
   ValidatorProcessed,
@@ -20,6 +20,32 @@ export const paginateValidators = (
         pageSize * count
       ),
     };
+  }
+
+  return validatorsInfo;
+};
+
+export const sortValidators = (
+  validatorsInfo: ValidatorsProcessedWithStatus,
+  sortBy?: keyof ValidatorProcessed,
+  orderBy?: Sort
+) => {
+  if (sortBy && orderBy) {
+    validatorsInfo.validators.sort((a, b) => {
+      const firstAccessor = sortBy in a ? a[sortBy] : a["totalStakeMotes"];
+
+      const secondAccessor = sortBy in b ? b[sortBy] : b["totalStakeMotes"];
+
+      if (firstAccessor < secondAccessor) {
+        return orderBy === "DESC" ? 1 : -1;
+      }
+
+      if (firstAccessor > secondAccessor) {
+        return orderBy === "DESC" ? -1 : 1;
+      }
+
+      return 0;
+    });
   }
 
   return validatorsInfo;
