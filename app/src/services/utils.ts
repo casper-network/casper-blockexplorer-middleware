@@ -1,6 +1,6 @@
 import { ValidatorsInfoResult } from "casper-js-sdk";
-import { Peer, Sort } from "../types";
 
+import { Peer, Sort } from "../types";
 import {
   ValidatorProcessed,
   ValidatorsProcessedWithStatus,
