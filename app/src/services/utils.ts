@@ -60,7 +60,9 @@ export const processValidatorsInfoResult = (
       ({ era_id }) => era_id === latestEraId
     )?.validator_weights ?? [];
 
-  const activeBids = validatorsInfoResult.auction_state.bids.filter(
+  const allBids = validatorsInfoResult.auction_state.bids;
+
+  const activeBids = allBids.filter(
     (validatorBid) => (validatorBid.bid as ActualBid).inactive === false
   );
 
@@ -77,7 +79,7 @@ export const processValidatorsInfoResult = (
     processedValidator.publicKey = validator.public_key;
     processedValidator.totalStakeMotes = totalStakeMotes;
 
-    const associatedBid = activeBids.find(
+    const associatedBid = allBids.find(
       (bid) => bid.public_key === validator.public_key
     );
 
