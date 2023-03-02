@@ -1,0 +1,51 @@
+name: ci-casper-blockexplorer-middleware
+
+on:
+  push:
+    branches:
+      - 'dev'
+      - 'feat-*'
+      - 'release-*'
+    paths-ignore:
+      - '**.md'
+
+  pull_request:
+    branches:
+      - 'dev'
+      - 'feat-*'
+      - 'release-*'
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [16.x]
+        os: [ubuntu-20.04, ubuntu-22.04]
+      runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install
+        run: make middleware-ci-install
+
+      - name: Audits
+        run: make middleware-audit
+
+      - name: Lints
+        run: make middleware-lint
+
+      - name: Test
+        run: make middleware-test
+        env:
+          NODE_URLS: https://rpc.testnet.casperlabs.io/rpc
