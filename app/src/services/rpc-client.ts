@@ -42,7 +42,22 @@ export class RpcClient {
   }
 
   async getLatestBlock() {
+    // TODO:
+    /*
+      - don't use latestBlock cache
+      - instead, check for largest height block from cache.keys()
+      - then access value and see if it's been 33s since (+ time padding like in FE?)
+      - if yes, then fetch latest block by using largest height + amount of time since block / 33s
+      -> or actually maybe could just use the rpcClient.getLatestBlockInfo()
+      - if no, simply just return the latest block from cache
+    */
+
     const existLatestBlock = this.cache.get<Block>(`latestBlock`);
+
+    console.log({ existLatestBlock });
+
+    // console.log("cache", this.cache.keys());
+
     if (existLatestBlock) return existLatestBlock;
 
     const { block } = await this.rpcClient.getLatestBlockInfo();
@@ -53,8 +68,10 @@ export class RpcClient {
     const cacheTimeInSeconds =
       BLOCK_GENERATE_INTERVAL - (Date.now() - blockTimestamp.getTime()) / 1000;
 
-    if (cacheTimeInSeconds > 0)
+    // TODO: this needs to be removed - it rarely works (see above)
+    if (cacheTimeInSeconds > 0) {
       this.cache.set(`latestBlock`, block, cacheTimeInSeconds);
+    }
 
     return block as unknown as Block;
   }
@@ -73,6 +90,7 @@ export class RpcClient {
 
   async getBlockByHeight(height: number) {
     const exsitBlock = this.cache.get<Block>(`block:${height}`);
+
     if (exsitBlock) return exsitBlock;
 
     const { block } = await this.rpcClient.getBlockInfoByHeight(height);

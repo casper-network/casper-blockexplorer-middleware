@@ -14,8 +14,10 @@ const router = express.Router();
 const sidecar = new ExtendedSidecar(SIDECAR_REST_URL || "");
 
 // Using our stable node
-const jsonRpc = new CasperServiceByJsonRPC(`http://localhost:${PORT}/rpc`);
-const rpcClient = new RpcClient(jsonRpc);
+export const jsonRpc = new CasperServiceByJsonRPC(
+  `http://localhost:${PORT}/rpc`
+);
+export const rpcClient = new RpcClient(jsonRpc);
 
 /**
  * @openapi

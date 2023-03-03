@@ -13,7 +13,7 @@ if (NODE_ENV !== "test") {
   });
 }
 
-export const BLOCK_GENERATE_INTERVAL = 30;
+export const BLOCK_GENERATE_INTERVAL = 30; // TODO: use 33?
 export const DEFAULT_PAGINATION_COUNT = 10;
 
 export const PORT = process.env.PORT || 4000;
