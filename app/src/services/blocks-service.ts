@@ -2,32 +2,12 @@ import { CasperServiceByJsonRPC } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
 import NodeCache from "node-cache";
 import cron from "node-cron";
-import {
-  BLOCK_GENERATE_INTERVAL,
-  BLOCK_TIME_PADDING_SECONDS,
-  DEFAULT_PAGINATION_COUNT,
-} from "../config";
+import { DEFAULT_PAGINATION_COUNT } from "../config";
 import { Sort } from "../types";
 import { Block } from "../types/on-chain";
 import { ApiError } from "../utils";
 
-// TODO: probably don't need to extend CacheService...
 export class BlocksService {
-  // TODO: maybe we could actually use a new Map() here??
-  // Since we'll actually be managing the cache ourselves, instead of using stdTTL
-  // We could probably use a Map to create the cache service?
-  // But maybe not, since node-cache provides a simple cleanup
-
-  // TODO: also need to think about managing the cache limit of 1M keys
-  // -> since either way it'll just be a JS object under the hood
-  // could consider making a duplicate cache if the original gets close to 1M
-  // -> probably just flush the cache when close to this limit.
-
-  // TODO: also should consider a cron service that actually just fetches the latest block on a timer
-  // this way we won't actually have to ever fetch the latest block async
-  // because once the cache fetches the latest block, it will just add to the cache
-  // ON SERVER START - we would automatically fetch the latest block (everything above from that point on)
-
   private cache: NodeCache;
   constructor(private readonly rpcClient: CasperServiceByJsonRPC) {
     this.cache = new NodeCache({ checkperiod: 0 });
@@ -36,6 +16,7 @@ export class BlocksService {
   async init() {
     await this.getLatestBlock();
 
+    // TODO: put into config
     cron.schedule(`*/15 * * * * *`, async () => {
       const overrideCache = true;
       await this.getLatestBlock(overrideCache);
@@ -107,13 +88,13 @@ export class BlocksService {
     if (!block) throw new ApiError(StatusCodes.NOT_FOUND, "Not found block");
 
     this.cache.set("latest", block);
-    this.cache.set(`block:${block.header.height}`, block);
+    this.cache.set(block.header.height, block);
 
     return block as unknown as Block;
   }
 
   async getBlockByHeight(height: number) {
-    const exsitBlock = this.cache.get<Block>(`block:${height}`);
+    const exsitBlock = this.cache.get<Block>(height);
 
     if (exsitBlock) return exsitBlock;
 
@@ -121,13 +102,13 @@ export class BlocksService {
 
     if (!block) throw new ApiError(StatusCodes.NOT_FOUND, "Not found block");
 
-    this.cache.set(`block:${height}`, block);
+    this.cache.set(height, block);
 
     return block as unknown as Block;
   }
 
   async getBlock(blockHash: string) {
-    const existBlock = this.cache.get<Block>(`block:${blockHash}`);
+    const existBlock = this.cache.get<Block>(blockHash);
 
     if (existBlock) return existBlock;
 
@@ -135,7 +116,7 @@ export class BlocksService {
 
     if (!block) throw new ApiError(StatusCodes.NOT_FOUND, "Not found block");
 
-    this.cache.set(`block:${blockHash}`, block);
+    this.cache.set(blockHash, block);
 
     return block as unknown as Block;
   }
