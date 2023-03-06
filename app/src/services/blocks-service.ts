@@ -1,7 +1,12 @@
 import { CasperServiceByJsonRPC } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
 import NodeCache from "node-cache";
-import { BLOCK_GENERATE_INTERVAL, DEFAULT_PAGINATION_COUNT } from "../config";
+import cron from "node-cron";
+import {
+  BLOCK_GENERATE_INTERVAL,
+  BLOCK_TIME_PADDING_SECONDS,
+  DEFAULT_PAGINATION_COUNT,
+} from "../config";
 import { Sort } from "../types";
 import { Block } from "../types/on-chain";
 import { ApiError } from "../utils";
@@ -16,6 +21,7 @@ export class BlocksService {
   // TODO: also need to think about managing the cache limit of 1M keys
   // -> since either way it'll just be a JS object under the hood
   // could consider making a duplicate cache if the original gets close to 1M
+  // -> probably just flush the cache when close to this limit.
 
   // TODO: also should consider a cron service that actually just fetches the latest block on a timer
   // this way we won't actually have to ever fetch the latest block async
@@ -27,12 +33,22 @@ export class BlocksService {
     this.cache = new NodeCache({ checkperiod: 0 });
   }
 
+  async init() {
+    await this.getLatestBlock();
+
+    cron.schedule(`*/15 * * * * *`, async () => {
+      const overrideCache = true;
+      await this.getLatestBlock(overrideCache);
+    });
+  }
+
   async getBlocks(
     count = DEFAULT_PAGINATION_COUNT,
     orderByHeight = "DESC" as Sort,
     pageNum = 1
   ) {
     const latestBlock = await this.getLatestBlock();
+
     const latestBlockHeight = latestBlock.header.height;
 
     const firstBlockOfPage = (pageNum - 1) * count;
@@ -79,37 +95,19 @@ export class BlocksService {
     return { blocks, total, updated: latestBlock.header.timestamp };
   }
 
-  async getLatestBlock() {
-    // TODO:
-    /*
-      - don't use latestBlock cache
-      - instead, check for largest height block from cache.keys()
-      - then access value and see if it's been 33s since (+ time padding like in FE?)
-      - if yes, then fetch latest block by using largest height + amount of time since block / 33s
-      -> or actually maybe could just use the rpcClient.getLatestBlockInfo()
-      - if no, simply just return the latest block from cache
-    */
+  async getLatestBlock(overrideCache?: boolean) {
+    const cachedLatestBlock = this.cache.get<Block>("latest");
 
-    const existLatestBlock = this.cache.get<Block>(`latestBlock`);
-
-    console.log({ existLatestBlock });
-
-    // console.log("cache", this.cache.keys());
-
-    if (existLatestBlock) return existLatestBlock;
+    if (cachedLatestBlock && !overrideCache) {
+      return cachedLatestBlock;
+    }
 
     const { block } = await this.rpcClient.getLatestBlockInfo();
+
     if (!block) throw new ApiError(StatusCodes.NOT_FOUND, "Not found block");
 
-    const blockTimestamp = new Date(block.header.timestamp);
-
-    const cacheTimeInSeconds =
-      BLOCK_GENERATE_INTERVAL - (Date.now() - blockTimestamp.getTime()) / 1000;
-
-    // TODO: this needs to be removed - it rarely works (see above)
-    if (cacheTimeInSeconds > 0) {
-      this.cache.set(`latestBlock`, block, cacheTimeInSeconds);
-    }
+    this.cache.set("latest", block);
+    this.cache.set(`block:${block.header.height}`, block);
 
     return block as unknown as Block;
   }
@@ -130,9 +128,11 @@ export class BlocksService {
 
   async getBlock(blockHash: string) {
     const existBlock = this.cache.get<Block>(`block:${blockHash}`);
+
     if (existBlock) return existBlock;
 
     const { block } = await this.rpcClient.getBlockInfo(blockHash);
+
     if (!block) throw new ApiError(StatusCodes.NOT_FOUND, "Not found block");
 
     this.cache.set(`block:${blockHash}`, block);
