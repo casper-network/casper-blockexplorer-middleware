@@ -4,3 +4,4 @@ export * from "./node-manager";
 export * from "./peers";
 export * from "./rpc-client";
 export * from "./sidecar";
+export * from "./blocks-service";

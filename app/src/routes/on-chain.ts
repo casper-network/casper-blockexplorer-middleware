@@ -5,7 +5,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { PORT, SIDECAR_IS_RUNNING, SIDECAR_REST_URL } from "../config";
 import { validate } from "../middlewares";
-import { ExtendedSidecar, RpcClient } from "../services";
+import { BlocksService, ExtendedSidecar, RpcClient } from "../services";
 import { Sort } from "../types";
 import { GetDeploy, ValidatorProcessed } from "../types/on-chain";
 import { ApiError, catchAsync, isValidHash, isValidPublicKey } from "../utils";
@@ -17,7 +17,8 @@ const sidecar = new ExtendedSidecar(SIDECAR_REST_URL || "");
 export const jsonRpc = new CasperServiceByJsonRPC(
   `http://localhost:${PORT}/rpc`
 );
-export const rpcClient = new RpcClient(jsonRpc);
+export const blocksService = new BlocksService(jsonRpc);
+export const rpcClient = new RpcClient(jsonRpc, blocksService);
 
 /**
  * @openapi
@@ -52,7 +53,7 @@ router.get(
       const latestBlock = await sidecar.getLatestBlock();
       res.json(latestBlock);
     } else {
-      const latestBlock = await rpcClient.getLatestBlock();
+      const latestBlock = await blocksService.getLatestBlock();
       res.json(latestBlock);
     }
   })
@@ -91,10 +92,12 @@ router.get(
       res.json(block);
     } else {
       if (/^\d+$/.test(hashOrHeight)) {
-        const block = await rpcClient.getBlockByHeight(parseInt(hashOrHeight));
+        const block = await blocksService.getBlockByHeight(
+          parseInt(hashOrHeight)
+        );
         res.json(block);
       } else {
-        const block = await rpcClient.getBlock(hashOrHeight);
+        const block = await blocksService.getBlock(hashOrHeight);
         res.json(block);
       }
     }
@@ -173,7 +176,11 @@ router.get(
       const result = await sidecar.getBlocks(from, count, orderByHeight);
       res.json(result);
     } else {
-      const result = await rpcClient.getBlocks(count, orderByHeight, pageNum);
+      const result = await blocksService.getBlocks(
+        count,
+        orderByHeight,
+        pageNum
+      );
       res.json(result);
     }
   })
