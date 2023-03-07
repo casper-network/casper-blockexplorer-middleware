@@ -1,10 +1,11 @@
 import app from "./app";
 import { PORT } from "./config";
-import { blocksService } from "./routes/on-chain";
+import { blocksService, validatorsService } from "./routes/on-chain";
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`⚡️[server]: Server is running at https://localhost:${PORT}`);
-  blocksService.init();
+  await blocksService.init();
+  await validatorsService.init();
 });
 
 process.on("uncaughtException", (err) => {
