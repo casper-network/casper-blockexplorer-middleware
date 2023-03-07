@@ -15,7 +15,7 @@ if (NODE_ENV !== "test") {
 
 export const BLOCK_GENERATE_INTERVAL = 30;
 export const DEFAULT_PAGINATION_COUNT = 10;
-export const NODE_CACHE_LIMIT = 2 ** 19;
+export const NODE_CACHE_LIMIT = 2 ** 19; // 524,288
 
 export const PORT = process.env.PORT || 4000;
 export const NODE_URLS = process.env.NODE_URLS;

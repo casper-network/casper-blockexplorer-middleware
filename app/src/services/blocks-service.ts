@@ -114,16 +114,11 @@ export class BlocksService {
   }
 
   async getBlock(blockHash: string) {
-    const cachedBlock = this.cache.get<Block>(blockHash);
-
-    if (cachedBlock) return cachedBlock;
-
     const { block } = await this.rpcClient.getBlockInfo(blockHash);
 
     if (!block) throw new ApiError(StatusCodes.NOT_FOUND, "Not found block");
 
     this.checkFlushCache();
-    this.cache.set(blockHash, block);
 
     return block as unknown as Block;
   }
