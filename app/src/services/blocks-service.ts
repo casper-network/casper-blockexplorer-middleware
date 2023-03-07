@@ -2,7 +2,11 @@ import { CasperServiceByJsonRPC } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
 import NodeCache from "node-cache";
 import cron from "node-cron";
-import { DEFAULT_PAGINATION_COUNT } from "../config";
+import {
+  BLOCK_GENERATE_INTERVAL,
+  DEFAULT_PAGINATION_COUNT,
+  NODE_CACHE_LIMIT,
+} from "../config";
 import { Sort } from "../types";
 import { Block } from "../types/on-chain";
 import { ApiError } from "../utils";
@@ -16,8 +20,8 @@ export class BlocksService {
   async init() {
     await this.getLatestBlock();
 
-    // TODO: put into config
-    cron.schedule(`*/15 * * * * *`, async () => {
+    // half of block interval time ensures we always have this in cache
+    cron.schedule(`*/${BLOCK_GENERATE_INTERVAL / 2} * * * * *`, async () => {
       const overrideCache = true;
       await this.getLatestBlock(overrideCache);
     });
@@ -102,6 +106,7 @@ export class BlocksService {
 
     if (!block) throw new ApiError(StatusCodes.NOT_FOUND, "Not found block");
 
+    this.checkFlushCache();
     this.cache.set(height, block);
 
     return block as unknown as Block;
@@ -116,8 +121,17 @@ export class BlocksService {
 
     if (!block) throw new ApiError(StatusCodes.NOT_FOUND, "Not found block");
 
+    this.checkFlushCache();
     this.cache.set(blockHash, block);
 
     return block as unknown as Block;
+  }
+
+  checkFlushCache() {
+    const cacheKeysLength = this.cache.keys().length;
+
+    if (cacheKeysLength > NODE_CACHE_LIMIT) {
+      this.cache.flushAll();
+    }
   }
 }
