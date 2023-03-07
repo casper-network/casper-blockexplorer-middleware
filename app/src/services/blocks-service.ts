@@ -2,6 +2,7 @@ import { CasperServiceByJsonRPC } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
 import NodeCache from "node-cache";
 import cron from "node-cron";
+
 import {
   BLOCK_GENERATE_INTERVAL,
   DEFAULT_PAGINATION_COUNT,
