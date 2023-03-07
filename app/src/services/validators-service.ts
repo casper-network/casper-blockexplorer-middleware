@@ -34,7 +34,7 @@ export class ValidatorsService {
         header: { era_id: latestEraId },
       } = await this.blocksService.getLatestBlock();
 
-      if (latestEraId === cachedValidatorsInfo?.status.latestEraId) {
+      if (latestEraId !== cachedValidatorsInfo?.status.latestEraId) {
         await this.getCurrentEraValidators();
       }
     });
