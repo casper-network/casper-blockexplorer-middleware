@@ -6,6 +6,7 @@ import { StatusCodes } from "http-status-codes";
 import { PORT, SIDECAR_IS_RUNNING, SIDECAR_REST_URL } from "../config";
 import { validate } from "../middlewares";
 import { BlocksService, ExtendedSidecar, RpcClient } from "../services";
+import { ValidatorsService } from "../services/validators-service";
 import { Sort } from "../types";
 import { GetDeploy, ValidatorProcessed } from "../types/on-chain";
 import { ApiError, catchAsync, isValidHash, isValidPublicKey } from "../utils";
@@ -18,6 +19,7 @@ export const jsonRpc = new CasperServiceByJsonRPC(
   `http://localhost:${PORT}/rpc`
 );
 export const blocksService = new BlocksService(jsonRpc);
+export const validatorsService = new ValidatorsService(jsonRpc, blocksService);
 export const rpcClient = new RpcClient(jsonRpc, blocksService);
 
 /**
@@ -386,7 +388,7 @@ router.get(
       sortBy: keyof ValidatorProcessed;
     };
 
-    const validators = await rpcClient.getCurrentEraValidators(
+    const validators = await validatorsService.getCurrentEraValidators(
       count,
       pageNum,
       sortBy,
@@ -399,7 +401,7 @@ router.get(
 router.get(
   "/current-era-validators-status",
   catchAsync(async (req, res) => {
-    const status = await rpcClient.getCurrentEraValidatorStatus();
+    const status = await validatorsService.getCurrentEraValidatorStatus();
     res.json(status);
   })
 );
