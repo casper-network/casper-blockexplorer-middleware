@@ -14,7 +14,6 @@ export class ValidatorsService {
     private readonly rpcClient: CasperServiceByJsonRPC,
     private readonly blocksService: BlocksService
   ) {
-    // TODO: define checkperiod and stdTTL
     this.cache = new NodeCache({ checkperiod: 0 });
     this.blocksService = blocksService;
   }
