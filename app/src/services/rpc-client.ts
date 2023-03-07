@@ -7,14 +7,13 @@ import {
 import { StatusCodes } from "http-status-codes";
 import NodeCache from "node-cache";
 
-import { BLOCK_GENERATE_INTERVAL, DEFAULT_PAGINATION_COUNT } from "../config";
 import { Sort } from "../types";
 import {
-  Block,
   ValidatorProcessed,
   ValidatorsProcessedWithStatus,
 } from "../types/on-chain";
 import { ApiError, isValidPublicKey } from "../utils";
+import { BlocksService } from "./blocks-service";
 import {
   paginateValidators,
   processValidatorsInfoResult,
@@ -26,8 +25,12 @@ export interface ActualBid extends Bid {
 }
 export class RpcClient {
   private cache: NodeCache;
-  constructor(private readonly rpcClient: CasperServiceByJsonRPC) {
+  constructor(
+    private readonly rpcClient: CasperServiceByJsonRPC,
+    private readonly blocksService: BlocksService
+  ) {
     this.cache = new NodeCache();
+    this.blocksService = blocksService;
   }
 
   async getStatus() {
@@ -39,100 +42,6 @@ export class RpcClient {
     this.cache.set("status", status);
 
     return status;
-  }
-
-  async getLatestBlock() {
-    const existLatestBlock = this.cache.get<Block>(`latestBlock`);
-    if (existLatestBlock) return existLatestBlock;
-
-    const { block } = await this.rpcClient.getLatestBlockInfo();
-    if (!block) throw new ApiError(StatusCodes.NOT_FOUND, "Not found block");
-
-    const blockTimestamp = new Date(block.header.timestamp);
-
-    const cacheTimeInSeconds =
-      BLOCK_GENERATE_INTERVAL - (Date.now() - blockTimestamp.getTime()) / 1000;
-
-    if (cacheTimeInSeconds > 0)
-      this.cache.set(`latestBlock`, block, cacheTimeInSeconds);
-
-    return block as unknown as Block;
-  }
-
-  async getBlock(blockHash: string) {
-    const existBlock = this.cache.get<Block>(`block:${blockHash}`);
-    if (existBlock) return existBlock;
-
-    const { block } = await this.rpcClient.getBlockInfo(blockHash);
-    if (!block) throw new ApiError(StatusCodes.NOT_FOUND, "Not found block");
-
-    this.cache.set(`block:${blockHash}`, block);
-
-    return block as unknown as Block;
-  }
-
-  async getBlockByHeight(height: number) {
-    const exsitBlock = this.cache.get<Block>(`block:${height}`);
-    if (exsitBlock) return exsitBlock;
-
-    const { block } = await this.rpcClient.getBlockInfoByHeight(height);
-
-    if (!block) throw new ApiError(StatusCodes.NOT_FOUND, "Not found block");
-
-    this.cache.set(`block:${height}`, block);
-
-    return block as unknown as Block;
-  }
-  async getBlocks(
-    count = DEFAULT_PAGINATION_COUNT,
-    orderByHeight = "DESC" as Sort,
-    pageNum = 1
-  ) {
-    const latestBlock = await this.getLatestBlock();
-    const latestBlockHeight = latestBlock.header.height;
-
-    const firstBlockOfPage = (pageNum - 1) * count;
-
-    const fromBlock =
-      orderByHeight === "DESC"
-        ? latestBlockHeight - firstBlockOfPage
-        : firstBlockOfPage;
-
-    let targetBlock =
-      orderByHeight === "DESC" ? fromBlock - count : fromBlock + count;
-
-    if (targetBlock < 0) {
-      targetBlock = 0;
-    }
-
-    if (targetBlock > latestBlockHeight) {
-      targetBlock = latestBlockHeight;
-    }
-
-    const blockPromises: Promise<Block>[] = [];
-
-    for (
-      let i = fromBlock;
-      orderByHeight === "DESC" ? i >= targetBlock : i < targetBlock;
-      orderByHeight === "DESC" ? i-- : i++
-    ) {
-      try {
-        const block = this.getBlockByHeight(i);
-        if (blockPromises.length === count) {
-          break;
-        }
-        blockPromises.push(block);
-      } catch (error) {
-        console.log("ERROR", error);
-        break;
-      }
-    }
-
-    const blocks = await Promise.all(blockPromises);
-
-    const total = latestBlockHeight + 1;
-
-    return { blocks, total, updated: latestBlock.header.timestamp };
   }
 
   async getDeploy(deployHash: string) {
@@ -172,7 +81,7 @@ export class RpcClient {
 
     const {
       header: { era_id: latestEraId },
-    } = await this.getLatestBlock();
+    } = await this.blocksService.getLatestBlock();
 
     if (
       cachedValidatorsInfo &&
@@ -217,7 +126,7 @@ export class RpcClient {
 
     const {
       header: { era_id: latestEraId },
-    } = await this.getLatestBlock();
+    } = await this.blocksService.getLatestBlock();
 
     if (
       cachedValidatorsInfo &&
