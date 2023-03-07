@@ -1,5 +1,6 @@
 import { CasperServiceByJsonRPC, ValidatorsInfoResult } from "casper-js-sdk";
 import NodeCache from "node-cache";
+
 import { Sort } from "../types";
 import {
   ValidatorProcessed,
