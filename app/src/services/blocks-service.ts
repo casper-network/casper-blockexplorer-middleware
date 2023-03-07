@@ -99,9 +99,9 @@ export class BlocksService {
   }
 
   async getBlockByHeight(height: number) {
-    const exsitBlock = this.cache.get<Block>(height);
+    const cachedBlock = this.cache.get<Block>(height);
 
-    if (exsitBlock) return exsitBlock;
+    if (cachedBlock) return cachedBlock;
 
     const { block } = await this.rpcClient.getBlockInfoByHeight(height);
 
@@ -114,9 +114,9 @@ export class BlocksService {
   }
 
   async getBlock(blockHash: string) {
-    const existBlock = this.cache.get<Block>(blockHash);
+    const cachedBlock = this.cache.get<Block>(blockHash);
 
-    if (existBlock) return existBlock;
+    if (cachedBlock) return cachedBlock;
 
     const { block } = await this.rpcClient.getBlockInfo(blockHash);
 
