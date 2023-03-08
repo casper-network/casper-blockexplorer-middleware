@@ -58,4 +58,15 @@ export class RpcClient {
       throw new ApiError(StatusCodes.NOT_FOUND, "Not found account");
     return account;
   };
+
+  async getBalance(uref: string) {
+    const stateRootHash = await this.rpcClient.getStateRootHash();
+    const balance = await this.rpcClient.getAccountBalance(stateRootHash, uref);
+
+    if (!balance) {
+      throw new ApiError(StatusCodes.NOT_FOUND, "Balance not found");
+    }
+
+    return balance.toString();
+  }
 }
