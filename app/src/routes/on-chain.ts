@@ -406,4 +406,24 @@ router.get(
   })
 );
 
+/**
+ * @openapi
+ * /balance:
+ *  get:
+ *    description: Returns the account balance.
+ *    responses:
+ *      200:
+ *        description: Returns the account balance
+ */
+router.get(
+  "/account/balance/:uref",
+  validate([param("uref").exists().isString().withMessage("Invalid uref")]),
+  catchAsync(async (req, res) => {
+    const { uref } = req.params;
+
+    const balance = await rpcClient.getBalance(uref);
+    res.json({ balance });
+  })
+);
+
 export default router;
