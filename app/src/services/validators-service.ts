@@ -2,6 +2,7 @@ import { CasperServiceByJsonRPC, ValidatorsInfoResult } from "casper-js-sdk";
 import NodeCache from "node-cache";
 import cron from "node-cron";
 
+import { ERA_CHECK_PERIOD_MINUTES } from "../config";
 import { Sort } from "../types";
 import {
   ValidatorProcessed,
@@ -24,7 +25,7 @@ export class ValidatorsService {
     await this.getCurrentEraValidators();
 
     // every 10th minute check to see if there is a new era
-    cron.schedule("*/10 * * * *", async () => {
+    cron.schedule(`*/${ERA_CHECK_PERIOD_MINUTES} * * * *`, async () => {
       const cachedValidatorsInfo =
         this.cache.get<ValidatorsProcessedWithStatus>(
           "processedValidatorsWithStatus"
