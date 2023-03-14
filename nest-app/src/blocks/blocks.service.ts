@@ -46,6 +46,7 @@ export interface Header {
   height: number;
   protocol_version: string;
 }
+
 const NODE_CACHE_LIMIT = 2 ** 19;
 
 // @Injectable()
@@ -53,7 +54,7 @@ export class BlocksService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
   async onModuleInit() {
-    console.log("in onModuleInit");
+    console.log("init BlocksService");
 
     await this.getLatestBlock();
   }
@@ -106,8 +107,6 @@ export class BlocksService {
   // TODO: add sorting logic
   async getBlocks(count = 10, orderByHeight = "desc", pageNum = 1) {
     const latestBlock = await this.getLatestBlock();
-
-    console.log({ latestBlock });
 
     const latestBlockHeight = latestBlock.header.height;
 
