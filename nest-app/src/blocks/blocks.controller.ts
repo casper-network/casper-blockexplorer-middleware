@@ -1,22 +1,6 @@
-import {
-  Controller,
-  Get,
-  Optional,
-  Param,
-  ParseBoolPipe,
-  ParseIntPipe,
-  Query,
-} from "@nestjs/common";
+import { Controller, Get, Query } from "@nestjs/common";
 import { Transform } from "class-transformer";
-import {
-  IsBoolean,
-  IsDate,
-  IsIn,
-  IsNumber,
-  IsNumberString,
-  IsOptional,
-  IsString,
-} from "class-validator";
+import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
 import { BlocksService } from "./blocks.service";
 
 export class BlocksQueryDtp {
@@ -54,5 +38,13 @@ export class BlocksController {
   @Get()
   async getBlocks(@Query() query: BlocksQueryDtp) {
     console.log({ query });
+
+    const blocks = this.blocksService.getBlocks(
+      query.count,
+      query.orderBy,
+      query.pageNum
+    );
+
+    return blocks;
   }
 }
