@@ -1,4 +1,15 @@
+import {
+  CacheTTL,
+  CACHE_MANAGER,
+  Inject,
+  Injectable,
+  OnModuleInit,
+} from "@nestjs/common";
+import { Cron } from "@nestjs/schedule";
+import { Cache } from "cache-manager";
 import { CasperServiceByJsonRPC } from "casper-js-sdk";
+import { StatusCodes } from "http-status-codes";
+import { ApiError } from "src/utils/ApiError";
 
 // Using our stable node
 export const jsonRpc = new CasperServiceByJsonRPC(
@@ -36,9 +47,39 @@ export interface Header {
   protocol_version: string;
 }
 
-export class BlocksService {
-  async getLatestBlock() {
+@Injectable()
+export class BlocksService implements OnModuleInit {
+  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
+
+  async onModuleInit() {
+    console.log("in onModuleInit");
+
+    await this.getLatestBlock();
+  }
+
+  @Cron(`*/${30 / 2} * * * * *`)
+  async handleCron() {
+    console.log("cron service running", new Date().getTime());
+
+    const overrideCache = true;
+    await this.getLatestBlock(overrideCache);
+  }
+
+  async getLatestBlock(overrideCache?: boolean) {
+    const cachedLatestBlock = this.cacheManager.get<Block>("latest");
+
+    if (cachedLatestBlock && !overrideCache) {
+      return cachedLatestBlock;
+    }
+
     const { block } = await jsonRpc.getLatestBlockInfo();
+
+    if (!block) {
+      throw new ApiError(StatusCodes.NOT_FOUND, "block not found.");
+    }
+
+    this.cacheManager.set("latest", block);
+    this.cacheManager.set(block.header.height.toLocaleString(), block);
 
     return block;
   }
@@ -54,6 +95,7 @@ export class BlocksService {
     return block as unknown as Block;
   }
 
+  // TODO: add sorting logic
   async getBlocks(count = 10, orderByHeight = "desc", pageNum = 1) {
     const latestBlock = await this.getLatestBlock();
 

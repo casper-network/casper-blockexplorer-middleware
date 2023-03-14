@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common';
-import { BlocksController } from './blocks.controller';
-import { BlocksService } from './blocks.service';
+import { CacheModule, Module } from "@nestjs/common";
+import { BlocksController } from "./blocks.controller";
+import { BlocksService } from "./blocks.service";
 
 @Module({
   controllers: [BlocksController],
