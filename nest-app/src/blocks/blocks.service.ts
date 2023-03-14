@@ -46,9 +46,10 @@ export interface Header {
   height: number;
   protocol_version: string;
 }
+const NODE_CACHE_LIMIT = 2 ** 19;
 
-@Injectable()
-export class BlocksService implements OnModuleInit {
+// @Injectable()
+export class BlocksService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
   async onModuleInit() {
@@ -66,7 +67,7 @@ export class BlocksService implements OnModuleInit {
   }
 
   async getLatestBlock(overrideCache?: boolean) {
-    const cachedLatestBlock = this.cacheManager.get<Block>("latest");
+    const cachedLatestBlock = await this.cacheManager.get<Block>("latest");
 
     if (cachedLatestBlock && !overrideCache) {
       return cachedLatestBlock;
@@ -75,22 +76,29 @@ export class BlocksService implements OnModuleInit {
     const { block } = await jsonRpc.getLatestBlockInfo();
 
     if (!block) {
-      throw new ApiError(StatusCodes.NOT_FOUND, "block not found.");
+      throw new ApiError(StatusCodes.NOT_FOUND, "Latest block not found.");
     }
 
-    this.cacheManager.set("latest", block);
-    this.cacheManager.set(block.header.height.toLocaleString(), block);
+    await this.cacheManager.set("latest", block);
+    await this.cacheManager.set(block.header.height.toLocaleString(), block);
 
     return block;
   }
 
   async getBlockByHeight(height: number) {
+    const cachedBlock = await this.cacheManager.get<Block>(
+      height.toLocaleString()
+    );
+
+    if (cachedBlock) return cachedBlock;
+
     const { block } = await jsonRpc.getBlockInfoByHeight(height);
 
-    // if (!block) throw new ApiError(StatusCodes.NOT_FOUND, "Not found block");
+    if (!block)
+      throw new ApiError(StatusCodes.NOT_FOUND, "Block by height not found");
 
-    // this.checkFlushCache();
-    // this.cache.set(height, block);
+    await this.checkFlushCache();
+    await this.cacheManager.set(height.toLocaleString(), block);
 
     return block as unknown as Block;
   }
@@ -98,6 +106,8 @@ export class BlocksService implements OnModuleInit {
   // TODO: add sorting logic
   async getBlocks(count = 10, orderByHeight = "desc", pageNum = 1) {
     const latestBlock = await this.getLatestBlock();
+
+    console.log({ latestBlock });
 
     const latestBlockHeight = latestBlock.header.height;
 
@@ -143,5 +153,13 @@ export class BlocksService implements OnModuleInit {
     const total = latestBlockHeight + 1;
 
     return { blocks, total, updated: latestBlock.header.timestamp };
+  }
+
+  async checkFlushCache() {
+    const cacheKeysLength = (await this.cacheManager.store.keys()).length;
+
+    if (cacheKeysLength > NODE_CACHE_LIMIT) {
+      this.cacheManager.reset();
+    }
   }
 }
