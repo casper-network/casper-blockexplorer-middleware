@@ -13,7 +13,6 @@ export class BlocksQueryDtp {
   @IsNumber()
   public count: number = 10;
 
-  // TODO: add @IsIn check?
   @IsString()
   @IsOptional()
   public sortBy: string;

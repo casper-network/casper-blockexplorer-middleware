@@ -11,7 +11,6 @@ import { CasperServiceByJsonRPC } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
 import { ApiError } from "src/utils/ApiError";
 
-// Using our stable node
 export const jsonRpc = new CasperServiceByJsonRPC(
   `https://rpc.mainnet.casperlabs.io/rpc`
 );
@@ -49,7 +48,7 @@ export interface Header {
 
 const NODE_CACHE_LIMIT = 2 ** 19;
 
-// @Injectable()
+@Injectable()
 export class BlocksService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
