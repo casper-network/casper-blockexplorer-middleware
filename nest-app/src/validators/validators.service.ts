@@ -1,4 +1,5 @@
 import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
+import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { Bid, ValidatorsInfoResult } from "casper-js-sdk";
 import { BlocksService, jsonRpc } from "src/blocks/blocks.service";
@@ -13,6 +14,9 @@ export interface ActualBid extends Bid {
   inactive: boolean;
 }
 
+// TODO: move to const
+export const ERA_CHECK_PERIOD_MINUTES = 10;
+
 @Injectable()
 export class ValidatorsService {
   constructor(
@@ -21,7 +25,23 @@ export class ValidatorsService {
   ) {}
 
   async onModuleInit() {
-    console.log("init ValidatorsService");
+    await this.getCurrentEraValidators();
+  }
+
+  @Cron(`*/${ERA_CHECK_PERIOD_MINUTES} * * * *`)
+  async hanldeCron() {
+    const cachedValidatorsInfo =
+      await this.cacheManager.get<ValidatorsProcessedWithStatus>(
+        "processedValidatorsWithStatus"
+      );
+
+    const {
+      header: { era_id: latestEraId },
+    } = await this.blocksService.getLatestBlock();
+
+    if (latestEraId !== cachedValidatorsInfo?.status.latestEraId) {
+      await this.getCurrentEraValidators();
+    }
   }
 
   async getCurrentEraValidators(
