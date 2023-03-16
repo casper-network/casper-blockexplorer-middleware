@@ -9,6 +9,7 @@ import {
   ValidationOptions,
 } from "class-validator";
 import { isValidHash } from "src/utils/validate";
+import { Sort } from "src/validators/validators.service";
 import { Block, BlocksService } from "./blocks.service";
 
 export class BlocksQueryDtp {
@@ -28,7 +29,7 @@ export class BlocksQueryDtp {
   @IsIn(["desc", "asc"])
   @IsString()
   @IsOptional()
-  public orderBy: string = "desc";
+  public orderBy: Sort = "desc";
 }
 
 export const IsValidHash = (
@@ -63,11 +64,9 @@ export class BlocksController {
 
   @Get()
   async getBlocks(@Query() query: BlocksQueryDtp) {
-    const blocks = this.blocksService.getBlocks(
-      query.count,
-      query.orderBy,
-      query.pageNum
-    );
+    const { count, orderBy, pageNum } = query;
+
+    const blocks = this.blocksService.getBlocks(count, orderBy, pageNum);
 
     return blocks;
   }

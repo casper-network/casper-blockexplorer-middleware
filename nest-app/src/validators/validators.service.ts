@@ -8,7 +8,7 @@ import {
 } from "src/types/validators";
 
 // TODO: move these types to better places
-export type Sort = "DESC" | "ASC";
+export type Sort = "desc" | "asc";
 export interface ActualBid extends Bid {
   inactive: boolean;
 }
@@ -16,8 +16,8 @@ export interface ActualBid extends Bid {
 @Injectable()
 export class ValidatorsService {
   constructor(
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
-    @Inject(BlocksService) private readonly blocksService: BlocksService
+    @Inject(BlocksService) private readonly blocksService: BlocksService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
 
   async onModuleInit() {
@@ -84,8 +84,6 @@ export class ValidatorsService {
     const {
       header: { era_id: latestEraId },
     } = await this.blocksService.getLatestBlock();
-
-    console.log({ latestEraId });
 
     if (
       cachedValidatorsInfo &&
@@ -200,11 +198,11 @@ export class ValidatorsService {
         const secondAccessor = sortBy in b ? b[sortBy] : b["totalStakeMotes"];
 
         if (firstAccessor < secondAccessor) {
-          return orderBy === "DESC" ? 1 : -1;
+          return orderBy === "desc" ? 1 : -1;
         }
 
         if (firstAccessor > secondAccessor) {
-          return orderBy === "DESC" ? -1 : 1;
+          return orderBy === "desc" ? -1 : 1;
         }
 
         return 0;
