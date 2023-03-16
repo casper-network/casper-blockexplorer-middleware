@@ -11,6 +11,7 @@ import { CasperServiceByJsonRPC } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
 import { ApiError } from "src/utils/ApiError";
 
+// TODO: move this to a better place!!
 export const jsonRpc = new CasperServiceByJsonRPC(
   `https://rpc.mainnet.casperlabs.io/rpc`
 );
@@ -53,20 +54,16 @@ export class BlocksService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
   async onModuleInit() {
-    console.log("init BlocksService");
-
     await this.getLatestBlock();
   }
 
   @Cron(`*/${30 / 2} * * * * *`)
   async handleCron() {
-    console.log("cron service running", new Date().getTime());
-
     const overrideCache = true;
     await this.getLatestBlock(overrideCache);
   }
 
-  async getLatestBlock(overrideCache?: boolean) {
+  public async getLatestBlock(overrideCache?: boolean) {
     const cachedLatestBlock = await this.cacheManager.get<Block>("latest");
 
     if (cachedLatestBlock && !overrideCache) {

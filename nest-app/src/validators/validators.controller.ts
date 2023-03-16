@@ -10,5 +10,8 @@ export class ValidatorsController {
   @Get("current-era-validators-status")
   async getCurrentEraValidatorStatus() {
     console.log("in getCurrentEraValidatorStatus");
+
+    const currentEraValidatorStatus =
+      this.validatorsService.getCurrentEraValidatorStatus();
   }
 }

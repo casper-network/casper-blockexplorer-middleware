@@ -6,5 +6,6 @@ import { BlocksService } from "./blocks.service";
   imports: [CacheModule.register({ ttl: Number.MAX_VALUE, max: 2 ** 19 })],
   controllers: [BlocksController],
   providers: [BlocksService],
+  exports: [BlocksService],
 })
 export class BlocksModule {}

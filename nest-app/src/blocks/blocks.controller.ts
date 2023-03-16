@@ -6,8 +6,6 @@ import {
   IsOptional,
   IsString,
   registerDecorator,
-  Validate,
-  ValidationArguments,
   ValidationOptions,
 } from "class-validator";
 import { isValidHash } from "src/utils/validate";
@@ -45,7 +43,7 @@ export const IsValidHash = (
       constraints: [property],
       options: validationOptions,
       validator: {
-        validate(value: any) {
+        validate(value: string) {
           return /^\d+$/.test(value) || isValidHash(value);
         },
       },
@@ -54,8 +52,6 @@ export const IsValidHash = (
 };
 
 export class BlocksByHashOrHeightParamDtp {
-  // @Validate(({ value }) => /^\d+$/.test(value) || isValidHash(value))
-  // @Transform(({ value }) => /^\d+$/.test(value) || isValidHash(value))
   @IsValidHash("hashOrHeight", { message: "Not a valid hash." })
   @IsString()
   public hashOrHeight: string;
@@ -67,8 +63,6 @@ export class BlocksController {
 
   @Get()
   async getBlocks(@Query() query: BlocksQueryDtp) {
-    console.log({ query });
-
     const blocks = this.blocksService.getBlocks(
       query.count,
       query.orderBy,
