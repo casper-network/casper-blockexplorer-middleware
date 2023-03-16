@@ -1,6 +1,7 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { Transform } from "class-transformer";
 import { IsNumber, IsOptional } from "class-validator";
+import { Peer } from "src/types/peers";
 import { PeersService } from "./peers.service";
 
 export class PeersQueryDtp {
@@ -22,8 +23,8 @@ export class PeersController {
   async getPeers(@Query() query: PeersQueryDtp) {
     const { pageNum, count } = query;
 
-    // const peers = this.peersService.getPeers()
+    const peers = await this.peersService.getPeers(count, pageNum);
 
-    console.log("in getPeers");
+    return peers;
   }
 }
