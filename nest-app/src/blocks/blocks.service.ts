@@ -95,10 +95,21 @@ export class BlocksService {
     const { block } = await jsonRpc.getBlockInfoByHeight(height);
 
     if (!block)
-      throw new ApiError(StatusCodes.NOT_FOUND, "Block by height not found");
+      throw new ApiError(StatusCodes.NOT_FOUND, "Block by height not found.");
 
     await this.checkFlushCache();
     await this.cacheManager.set(height.toLocaleString(), block);
+
+    return block as unknown as Block;
+  }
+
+  async getBlock(blockHash: string) {
+    const { block } = await jsonRpc.getBlockInfo(blockHash);
+
+    if (!block)
+      throw new ApiError(StatusCodes.NOT_FOUND, "Block by hash not found.");
+
+    this.checkFlushCache();
 
     return block as unknown as Block;
   }

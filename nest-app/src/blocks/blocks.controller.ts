@@ -1,7 +1,17 @@
-import { Controller, Get, Query } from "@nestjs/common";
+import { Controller, Get, Param, Query } from "@nestjs/common";
 import { Transform } from "class-transformer";
-import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
-import { BlocksService } from "./blocks.service";
+import {
+  IsIn,
+  IsNumber,
+  IsOptional,
+  IsString,
+  registerDecorator,
+  Validate,
+  ValidationArguments,
+  ValidationOptions,
+} from "class-validator";
+import { isValidHash } from "src/utils/validate";
+import { Block, BlocksService } from "./blocks.service";
 
 export class BlocksQueryDtp {
   @Transform(({ value }) => parseInt(value, 10))
@@ -23,16 +33,37 @@ export class BlocksQueryDtp {
   public orderBy: string = "desc";
 }
 
+export const IsValidHash = (
+  property: string,
+  validationOptions?: ValidationOptions
+) => {
+  return function (object: Object, propertyName: string) {
+    registerDecorator({
+      name: "isValidHash",
+      target: object.constructor,
+      propertyName: propertyName,
+      constraints: [property],
+      options: validationOptions,
+      validator: {
+        validate(value: any) {
+          return /^\d+$/.test(value) || isValidHash(value);
+        },
+      },
+    });
+  };
+};
+
+export class BlocksByHashOrHeightParamDtp {
+  // @Validate(({ value }) => /^\d+$/.test(value) || isValidHash(value))
+  // @Transform(({ value }) => /^\d+$/.test(value) || isValidHash(value))
+  @IsValidHash("hashOrHeight", { message: "Not a valid hash." })
+  @IsString()
+  public hashOrHeight: string;
+}
+
 @Controller("blocks")
 export class BlocksController {
   constructor(private readonly blocksService: BlocksService) {}
-
-  @Get("latest-block")
-  async getLatestBlock() {
-    const latestBlock = await this.blocksService.getLatestBlock();
-
-    return latestBlock;
-  }
 
   @Get()
   async getBlocks(@Query() query: BlocksQueryDtp) {
@@ -45,5 +76,26 @@ export class BlocksController {
     );
 
     return blocks;
+  }
+
+  @Get("latest-block")
+  async getLatestBlock() {
+    const latestBlock = await this.blocksService.getLatestBlock();
+
+    return latestBlock;
+  }
+
+  @Get(":hashOrHeight")
+  async getBlockByHashOrHeight(@Param() params: BlocksByHashOrHeightParamDtp) {
+    const { hashOrHeight } = params;
+
+    let block: Block;
+    if (/^\d+$/.test(hashOrHeight)) {
+      block = await this.blocksService.getBlockByHeight(parseInt(hashOrHeight));
+    } else {
+      block = await this.blocksService.getBlock(hashOrHeight);
+    }
+
+    return block;
   }
 }
