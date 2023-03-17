@@ -3,6 +3,7 @@ import { ScheduleModule } from "@nestjs/schedule";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { BlocksModule } from "./blocks/blocks.module";
+import { DeploysModule } from "./deploys/deploys.module";
 import { PeersModule } from "./peers/peers.module";
 import { ValidatorsModule } from "./validators/validators.module";
 
@@ -11,6 +12,7 @@ import { ValidatorsModule } from "./validators/validators.module";
     BlocksModule,
     ValidatorsModule,
     PeersModule,
+    DeploysModule,
     ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
