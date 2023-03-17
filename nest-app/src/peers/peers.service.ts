@@ -13,30 +13,21 @@ export class PeersService {
 
   async onModuleInit() {
     console.log("on init peers service");
-    await this.getPeers();
+    await this.fetchPeersRpc();
   }
 
-  // every two minutes
+  // TODO: need to check to make sure this system works
   @Cron(`*/2 * * * *`)
   async handleCron() {
-    if (!this.isFetchingPeers) {
-      console.log("fetch peers in cron");
-      const overrideCache = true;
-      await this.getPeers(undefined, undefined, overrideCache);
-    }
+    console.log("isFetching", this.isFetchingPeers);
+    await this.fetchPeersRpc();
   }
 
-  async getPeers(count?: number, pageNum?: number, overrideCache?: boolean) {
-    const cachedPeers = await this.cacheManager.get<Peer[]>("peers");
-
-    if (cachedPeers && !overrideCache) {
-      return {
-        paginatedResult: this.paginatePeers(cachedPeers, count, pageNum),
-        totalPeers: cachedPeers.length,
-      };
+  async fetchPeersRpc() {
+    if (this.isFetchingPeers) {
+      return;
     }
 
-    // TODO: better way to do this?
     this.isFetchingPeers = true;
     const { peers } = await jsonRpc.getPeers();
     this.isFetchingPeers = false;
@@ -47,10 +38,19 @@ export class PeersService {
     });
 
     await this.cacheManager.set("peers", peersTransformed);
+  }
+
+  async getPeers(count?: number, pageNum?: number) {
+    let cachedPeers = await this.cacheManager.get<Peer[]>("peers");
+
+    if (!cachedPeers || !cachedPeers.length) {
+      await this.fetchPeersRpc();
+      cachedPeers = await this.cacheManager.get<Peer[]>("peers");
+    }
 
     return {
-      paginatedResult: this.paginatePeers(peersTransformed, count, pageNum),
-      totalPeers: peersTransformed.length,
+      paginatedResult: this.paginatePeers(cachedPeers, count, pageNum),
+      totalPeers: cachedPeers.length,
     };
   }
 
