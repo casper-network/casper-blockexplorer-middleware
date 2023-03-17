@@ -2,29 +2,44 @@ import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { jsonRpc } from "src/blocks/blocks.service";
 import { Peer } from "src/types/peers";
 import { Cache } from "cache-manager";
+import { Cron } from "@nestjs/schedule";
 
 // TODO: figure out method types (protected, private, public, etc.)
 @Injectable()
 export class PeersService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
+  isFetchingPeers = false;
+
   async onModuleInit() {
     console.log("on init peers service");
+    await this.getPeers();
   }
 
-  // TODO: add caching - how often do we want to clear?
-  // avoids 'Return type of public method from exported class has or is using name 'Peer' from external module' error
-  async getPeers(count?: number, pageNum?: number): Promise<any> {
+  // every two minutes
+  @Cron(`*/2 * * * *`)
+  async handleCron() {
+    if (!this.isFetchingPeers) {
+      console.log("fetch peers in cron");
+      const overrideCache = true;
+      await this.getPeers(undefined, undefined, overrideCache);
+    }
+  }
+
+  async getPeers(count?: number, pageNum?: number, overrideCache?: boolean) {
     const cachedPeers = await this.cacheManager.get<Peer[]>("peers");
 
-    if (cachedPeers) {
+    if (cachedPeers && !overrideCache) {
       return {
         paginatedResult: this.paginatePeers(cachedPeers, count, pageNum),
         totalPeers: cachedPeers.length,
       };
     }
 
+    // TODO: better way to do this?
+    this.isFetchingPeers = true;
     const { peers } = await jsonRpc.getPeers();
+    this.isFetchingPeers = false;
 
     const peersTransformed: Peer[] = peers.map((peer) => {
       const { node_id: nodeId, address } = peer;
