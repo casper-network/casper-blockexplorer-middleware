@@ -1,5 +1,7 @@
 # Blockexplorer Middleware
 
+Here is the [frontend repo](https://github.com/casper-network/casper-blockexplorer-frontend) of the blockexplorer app.
+
 ### Setup
 
 Docker and Docker Compose must be set and running before the following steps:
