@@ -1,6 +1,6 @@
 # Blockexplorer Middleware
 
-Here is the [frontend repo](https://github.com/casper-network/casper-blockexplorer-frontend) of the blockexplorer app.
+Here is the [frontend repo](https://github.com/casper-network/casper-blockexplorer-frontend) for the blockexplorer app.
 
 ### Setup
 
