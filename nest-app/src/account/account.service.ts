@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { CLPublicKey, StoredValue } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
 import { jsonRpc } from "src/blocks/blocks.service";
@@ -7,17 +7,16 @@ import { isValidPublicKey } from "src/utils/validate";
 
 @Injectable()
 export class AccountService {
-  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
-
   async getAccount(hashOrPublicKey: string): Promise<StoredValue["Account"]> {
+    // TODO: can this be assigned onModuleInit?
     const stateRootHash = await jsonRpc.getStateRootHash();
-    const something = isValidPublicKey(hashOrPublicKey)
+    const accountHash = isValidPublicKey(hashOrPublicKey)
       ? CLPublicKey.fromHex(hashOrPublicKey).toAccountHashStr()
       : `account-hash-${hashOrPublicKey}`;
 
     const { Account: account } = await jsonRpc.getBlockState(
       stateRootHash,
-      something,
+      accountHash,
       []
     );
 
@@ -25,5 +24,16 @@ export class AccountService {
       throw new ApiError(StatusCodes.NOT_FOUND, "Account not found.");
 
     return account;
+  }
+
+  async getBalance(uref: string) {
+    const stateRootHash = await jsonRpc.getStateRootHash();
+    const balance = await jsonRpc.getAccountBalance(stateRootHash, uref);
+
+    if (!balance) {
+      throw new ApiError(StatusCodes.NOT_FOUND, "Balance not found.");
+    }
+
+    return balance.toString();
   }
 }

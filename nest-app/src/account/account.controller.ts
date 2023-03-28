@@ -5,25 +5,24 @@ import {
   registerDecorator,
   ValidationOptions,
 } from "class-validator";
-import { IsValidHash } from "src/blocks/blocks.controller";
-import { isValidPublicKey } from "src/utils/validate";
+import { isValidHash, isValidPublicKey } from "src/utils/validate";
 import { AccountService } from "./account.service";
 
 // TODO: put these in some form of utils
-export const IsValidPublicKey = (
+export const IsValidPublicKeyOrHash = (
   property: string,
   validationOptions?: ValidationOptions
 ) => {
   return function (object: Object, propertyName: string) {
     registerDecorator({
-      name: "isValidPublicKey",
+      name: "isValidPublicKeyOrHash",
       target: object.constructor,
       propertyName: propertyName,
       constraints: [property],
       options: validationOptions,
       validator: {
         validate(value: string) {
-          return isValidPublicKey(value);
+          return isValidPublicKey(value) || isValidHash(value);
         },
       },
     });
@@ -31,13 +30,19 @@ export const IsValidPublicKey = (
 };
 
 export class AccountByHashOrPublicKeyParamDtp {
-  @IsValidHash("hashOrPublicKey", { message: "Not a valid hash." })
-  @IsValidPublicKey("hashOrPublicKey", { message: "Not a valid public key." })
+  @IsValidPublicKeyOrHash("hashOrPublicKey", {
+    message: "Not a valid public key or hash.",
+  })
   @IsString()
   public hashOrPublicKey: string;
 }
 
-Controller("account");
+export class AccountBalanceParamDtp {
+  @IsString()
+  public uref: string;
+}
+
+@Controller("account")
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
@@ -50,5 +55,14 @@ export class AccountController {
     const account = await this.accountService.getAccount(hashOrPublicKey);
 
     return account;
+  }
+
+  @Get("balance/:uref")
+  async getAccountBalance(@Param() params: AccountBalanceParamDtp) {
+    const { uref } = params;
+
+    const balance = await this.accountService.getBalance(uref);
+
+    return { balance };
   }
 }
