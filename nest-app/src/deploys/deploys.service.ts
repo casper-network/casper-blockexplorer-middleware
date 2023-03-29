@@ -5,10 +5,6 @@ import { jsonRpc } from "src/blocks/blocks.service";
 
 @Injectable()
 export class DeploysService {
-  async onModuleInit() {
-    console.log("init deploy service");
-  }
-
   async getDeploy(
     hash: string
   ): Promise<JsonDeploy & { execution_results: JsonExecutionResult[] }> {

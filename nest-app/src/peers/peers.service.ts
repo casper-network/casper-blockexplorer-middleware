@@ -12,14 +12,12 @@ export class PeersService {
   isFetchingPeers = false;
 
   async onModuleInit() {
-    console.log("on init peers service");
     await this.fetchPeersRpc();
   }
 
   // TODO: need to check to make sure this system works
   @Cron(`*/2 * * * *`)
   async handleCron() {
-    console.log("isFetching", this.isFetchingPeers);
     await this.fetchPeersRpc();
   }
 
