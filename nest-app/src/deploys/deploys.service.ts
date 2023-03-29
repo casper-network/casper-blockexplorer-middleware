@@ -1,4 +1,7 @@
 import { Injectable } from "@nestjs/common";
+import { JsonDeploy, JsonExecutionResult } from "casper-js-sdk";
+import { Deploy } from "casper-js-sdk/dist/lib/DeployUtil";
+import { jsonRpc } from "src/blocks/blocks.service";
 
 @Injectable()
 export class DeploysService {
@@ -6,7 +9,11 @@ export class DeploysService {
     console.log("init deploy service");
   }
 
-  async getDeploy(hash: string) {
-    console.log("in getDeploy hash", hash);
+  async getDeploy(
+    hash: string
+  ): Promise<JsonDeploy & { execution_results: JsonExecutionResult[] }> {
+    const { deploy, execution_results } = await jsonRpc.getDeployInfo(hash);
+
+    return { ...deploy, execution_results };
   }
 }
