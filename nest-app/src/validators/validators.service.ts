@@ -2,7 +2,8 @@ import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { Bid, ValidatorsInfoResult } from "casper-js-sdk";
-import { BlocksService, jsonRpc } from "src/blocks/blocks.service";
+import { BlocksService } from "src/blocks/blocks.service";
+import { jsonRpc } from "src/main";
 import {
   ValidatorProcessed,
   ValidatorsProcessedWithStatus,

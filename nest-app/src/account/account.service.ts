@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { CLPublicKey, StoredValue } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
-import { jsonRpc } from "src/blocks/blocks.service";
+import { jsonRpc } from "src/main";
 import { ApiError } from "src/utils/ApiError";
 import { isValidPublicKey } from "src/utils/validate";
 

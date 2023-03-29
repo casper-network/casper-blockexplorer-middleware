@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { JsonDeploy, JsonExecutionResult } from "casper-js-sdk";
-import { Deploy } from "casper-js-sdk/dist/lib/DeployUtil";
-import { jsonRpc } from "src/blocks/blocks.service";
+import { jsonRpc } from "src/main";
 
 @Injectable()
 export class DeploysService {

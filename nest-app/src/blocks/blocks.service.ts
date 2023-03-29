@@ -1,17 +1,11 @@
 import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
-import { CasperServiceByJsonRPC } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
 import { NODE_CACHE_LIMIT } from "src/config";
-import { nodeManager } from "src/node-manager";
+import { jsonRpc } from "src/main";
 import { Block } from "src/types/api";
 import { ApiError } from "src/utils/ApiError";
-
-// TODO: move this to a better place!!
-export const jsonRpc = new CasperServiceByJsonRPC(
-  nodeManager.getActiveNode().url ?? "https://rpc.mainnet.casperlabs.io/rpc"
-);
 
 @Injectable()
 export class BlocksService {
