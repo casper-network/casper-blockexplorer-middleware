@@ -1,17 +1,18 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { Transform } from "class-transformer";
 import { IsNumber, IsOptional } from "class-validator";
+
 import { PeersService } from "./peers.service";
 
 export class PeersQueryDtp {
   @Transform(({ value }) => parseInt(value, 10))
   @IsNumber()
   @IsOptional()
-  public pageNum: number = 1;
+  public pageNum = 1;
 
   @Transform(({ value }) => parseInt(value, 10))
   @IsNumber()
-  public count: number = 10;
+  public count = 10;
 }
 
 @Controller("peers")

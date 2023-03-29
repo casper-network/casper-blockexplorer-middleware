@@ -2,6 +2,7 @@ import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { GetStatusResult } from "casper-js-sdk";
+
 import { jsonRpc } from "./main";
 
 @Injectable()

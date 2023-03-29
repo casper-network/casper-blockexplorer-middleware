@@ -2,6 +2,7 @@ import { Controller, Get, Query } from "@nestjs/common";
 import { Transform } from "class-transformer";
 import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
 import { ValidatorProcessed } from "src/types/api";
+
 import { Sort, ValidatorsService } from "./validators.service";
 
 // TODO: maybe this should be used for all pagination requests?
@@ -9,11 +10,11 @@ export class ValidatorsQueryDtp {
   @Transform(({ value }) => parseInt(value, 10))
   @IsNumber()
   @IsOptional()
-  public pageNum: number = 1;
+  public pageNum = 1;
 
   @Transform(({ value }) => parseInt(value, 10))
   @IsNumber()
-  public count: number = 10;
+  public count = 10;
 
   @IsString()
   @IsOptional()

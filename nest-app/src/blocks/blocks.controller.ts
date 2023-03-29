@@ -11,17 +11,18 @@ import {
 import { Block } from "src/types/api";
 import { isValidHash } from "src/utils/validate";
 import { Sort } from "src/validators/validators.service";
+
 import { BlocksService } from "./blocks.service";
 
 export class BlocksQueryDtp {
   @Transform(({ value }) => parseInt(value, 10))
   @IsNumber()
   @IsOptional()
-  public pageNum: number = 1;
+  public pageNum = 1;
 
   @Transform(({ value }) => parseInt(value, 10))
   @IsNumber()
-  public count: number = 10;
+  public count = 10;
 
   @IsString()
   @IsOptional()
@@ -37,7 +38,7 @@ export const IsValidHash = (
   property: string,
   validationOptions?: ValidationOptions
 ) => {
-  return function (object: Object, propertyName: string) {
+  return function (object: unknown, propertyName: string) {
     registerDecorator({
       name: "isValidHash",
       target: object.constructor,

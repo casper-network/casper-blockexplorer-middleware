@@ -1,6 +1,7 @@
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { CasperServiceByJsonRPC } from "casper-js-sdk";
+
 import { AppModule } from "./app.module";
 import { nodeManager } from "./node-manager";
 

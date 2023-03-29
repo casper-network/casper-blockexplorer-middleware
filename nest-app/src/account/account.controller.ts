@@ -6,6 +6,7 @@ import {
   ValidationOptions,
 } from "class-validator";
 import { isValidHash, isValidPublicKey } from "src/utils/validate";
+
 import { AccountService } from "./account.service";
 
 // TODO: put these in some form of utils
@@ -13,7 +14,7 @@ export const IsValidPublicKeyOrHash = (
   property: string,
   validationOptions?: ValidationOptions
 ) => {
-  return function (object: Object, propertyName: string) {
+  return function (object: unknown, propertyName: string) {
     registerDecorator({
       name: "isValidPublicKeyOrHash",
       target: object.constructor,

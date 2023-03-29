@@ -1,5 +1,6 @@
 import { CacheModule, Module } from "@nestjs/common";
 import { ScheduleModule } from "@nestjs/schedule";
+
 import { AccountModule } from "./account/account.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";

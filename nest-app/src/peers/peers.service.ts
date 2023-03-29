@@ -1,8 +1,8 @@
 import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
-import { Cache } from "cache-manager";
 import { Cron } from "@nestjs/schedule";
-import { Peer } from "src/types/api";
+import { Cache } from "cache-manager";
 import { jsonRpc } from "src/main";
+import { Peer } from "src/types/api";
 
 // TODO: figure out method types (protected, private, public, etc.)
 @Injectable()
