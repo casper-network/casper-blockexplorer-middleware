@@ -6,7 +6,7 @@ import { BlocksService, jsonRpc } from "src/blocks/blocks.service";
 import {
   ValidatorProcessed,
   ValidatorsProcessedWithStatus,
-} from "src/types/validators";
+} from "src/types/api";
 
 // TODO: move these types to better places
 export type Sort = "desc" | "asc";

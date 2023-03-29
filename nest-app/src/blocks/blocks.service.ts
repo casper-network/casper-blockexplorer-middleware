@@ -1,53 +1,16 @@
-import {
-  CacheTTL,
-  CACHE_MANAGER,
-  Inject,
-  Injectable,
-  OnModuleInit,
-} from "@nestjs/common";
+import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { CasperServiceByJsonRPC } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
+import { NODE_CACHE_LIMIT } from "src/config";
+import { Block } from "src/types/api";
 import { ApiError } from "src/utils/ApiError";
 
 // TODO: move this to a better place!!
 export const jsonRpc = new CasperServiceByJsonRPC(
   `https://rpc.mainnet.casperlabs.io/rpc`
 );
-
-export interface Block {
-  hash: string;
-  header: Header;
-  body: Body;
-  proofs: Proof[];
-}
-
-export interface Proof {
-  public_key: string;
-  signature: string;
-}
-
-export interface Body {
-  proposer: string;
-  deploy_hashes: string[];
-  transfer_hashes: string[];
-}
-
-export interface Header {
-  parent_hash: string;
-  state_root_hash: string;
-  body_hash: string;
-  random_bit: boolean;
-  accumulated_seed: string;
-  era_end: null;
-  timestamp: string;
-  era_id: number;
-  height: number;
-  protocol_version: string;
-}
-
-const NODE_CACHE_LIMIT = 2 ** 19;
 
 @Injectable()
 export class BlocksService {

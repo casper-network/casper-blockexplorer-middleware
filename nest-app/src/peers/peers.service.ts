@@ -1,8 +1,8 @@
 import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { jsonRpc } from "src/blocks/blocks.service";
-import { Peer } from "src/types/peers";
 import { Cache } from "cache-manager";
 import { Cron } from "@nestjs/schedule";
+import { Peer } from "src/types/api";
 
 // TODO: figure out method types (protected, private, public, etc.)
 @Injectable()
@@ -15,7 +15,6 @@ export class PeersService {
     await this.fetchPeersRpc();
   }
 
-  // TODO: need to check to make sure this system works
   @Cron(`*/2 * * * *`)
   async handleCron() {
     await this.fetchPeersRpc();

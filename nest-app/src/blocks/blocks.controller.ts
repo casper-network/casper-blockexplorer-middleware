@@ -8,9 +8,10 @@ import {
   registerDecorator,
   ValidationOptions,
 } from "class-validator";
+import { Block } from "src/types/api";
 import { isValidHash } from "src/utils/validate";
 import { Sort } from "src/validators/validators.service";
-import { Block, BlocksService } from "./blocks.service";
+import { BlocksService } from "./blocks.service";
 
 export class BlocksQueryDtp {
   @Transform(({ value }) => parseInt(value, 10))
