@@ -1,7 +1,6 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { Transform } from "class-transformer";
 import { IsNumber, IsOptional } from "class-validator";
-import { Peer } from "src/types/peers";
 import { PeersService } from "./peers.service";
 
 export class PeersQueryDtp {

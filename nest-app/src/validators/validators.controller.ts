@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { Transform } from "class-transformer";
 import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
-import { ValidatorProcessed } from "src/types/validators";
+import { ValidatorProcessed } from "src/types/api";
 import { Sort, ValidatorsService } from "./validators.service";
 
 // TODO: maybe this should be used for all pagination requests?
