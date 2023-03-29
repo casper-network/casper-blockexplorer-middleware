@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { CacheModule, Module } from "@nestjs/common";
 import { ScheduleModule } from "@nestjs/schedule";
 import { AccountModule } from "./account/account.module";
 import { AppController } from "./app.controller";
@@ -16,6 +16,7 @@ import { ValidatorsModule } from "./validators/validators.module";
     DeploysModule,
     AccountModule,
     ScheduleModule.forRoot(),
+    CacheModule.register({ ttl: Number.MAX_VALUE, max: 2 ** 19 }),
   ],
   controllers: [AppController],
   providers: [AppService],
