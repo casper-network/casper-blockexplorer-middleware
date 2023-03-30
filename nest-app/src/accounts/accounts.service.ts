@@ -6,7 +6,7 @@ import { ApiError } from "src/utils/ApiError";
 import { isValidPublicKey } from "src/utils/validate";
 
 @Injectable()
-export class AccountService {
+export class AccountsService {
   async getAccount(hashOrPublicKey: string): Promise<StoredValue["Account"]> {
     const stateRootHash = await jsonRpc.getStateRootHash();
     const accountHash = isValidPublicKey(hashOrPublicKey)

@@ -3,7 +3,7 @@ import { StoredValue } from "casper-js-sdk";
 import { IsString } from "class-validator";
 import { IsValidPublicKeyOrHash } from "src/utils/nest-validation";
 
-import { AccountService } from "./account.service";
+import { AccountsService } from "./accounts.service";
 
 export class AccountByHashOrPublicKeyParamDtp {
   @IsValidPublicKeyOrHash("hashOrPublicKey", {
@@ -19,8 +19,8 @@ export class AccountBalanceParamDtp {
 }
 
 @Controller("account")
-export class AccountController {
-  constructor(private readonly accountService: AccountService) {}
+export class AccountsController {
+  constructor(private readonly accountsService: AccountsService) {}
 
   @Get(":hashOrPublicKey")
   async getAccountByHashOrPublicKey(
@@ -28,7 +28,7 @@ export class AccountController {
   ): Promise<StoredValue["Account"]> {
     const { hashOrPublicKey } = params;
 
-    const account = await this.accountService.getAccount(hashOrPublicKey);
+    const account = await this.accountsService.getAccount(hashOrPublicKey);
 
     return account;
   }
@@ -37,7 +37,7 @@ export class AccountController {
   async getAccountBalance(@Param() params: AccountBalanceParamDtp) {
     const { uref } = params;
 
-    const balance = await this.accountService.getBalance(uref);
+    const balance = await this.accountsService.getBalance(uref);
 
     return { balance };
   }
