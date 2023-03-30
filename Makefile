@@ -37,4 +37,4 @@ middleware-lint:
 	cd nest-app && npm run lint
 
 middleware-test:
-	cd nest-app && npm run test --passWithNoTests
+	cd nest-app && npm run test
