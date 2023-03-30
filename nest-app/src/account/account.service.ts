@@ -8,7 +8,6 @@ import { isValidPublicKey } from "src/utils/validate";
 @Injectable()
 export class AccountService {
   async getAccount(hashOrPublicKey: string): Promise<StoredValue["Account"]> {
-    // TODO: can this be assigned onModuleInit?
     const stateRootHash = await jsonRpc.getStateRootHash();
     const accountHash = isValidPublicKey(hashOrPublicKey)
       ? CLPublicKey.fromHex(hashOrPublicKey).toAccountHashStr()

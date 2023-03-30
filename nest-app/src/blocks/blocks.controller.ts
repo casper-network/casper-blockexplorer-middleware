@@ -1,17 +1,8 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { Transform } from "class-transformer";
-import {
-  IsIn,
-  IsNumber,
-  IsOptional,
-  IsString,
-  registerDecorator,
-  ValidationOptions,
-} from "class-validator";
-import { Block } from "src/types/api";
-import { isValidHash } from "src/utils/validate";
-import { Sort } from "src/validators/validators.service";
-
+import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
+import { Block, Sort } from "src/types/api";
+import { IsValidHash } from "src/utils/nest-validation";
 import { BlocksService } from "./blocks.service";
 
 export class BlocksQueryDtp {
@@ -33,26 +24,6 @@ export class BlocksQueryDtp {
   @IsOptional()
   public orderBy: Sort = "desc";
 }
-
-export const IsValidHash = (
-  property: string,
-  validationOptions?: ValidationOptions
-) => {
-  return function (object: unknown, propertyName: string) {
-    registerDecorator({
-      name: "isValidHash",
-      target: object.constructor,
-      propertyName: propertyName,
-      constraints: [property],
-      options: validationOptions,
-      validator: {
-        validate(value: string) {
-          return /^\d+$/.test(value) || isValidHash(value);
-        },
-      },
-    });
-  };
-};
 
 export class BlocksByHashOrHeightParamDtp {
   @IsValidHash("hashOrHeight", { message: "Not a valid hash." })

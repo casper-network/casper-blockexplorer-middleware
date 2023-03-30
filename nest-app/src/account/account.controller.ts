@@ -1,34 +1,9 @@
 import { Controller, Get, Param } from "@nestjs/common";
 import { StoredValue } from "casper-js-sdk";
-import {
-  IsString,
-  registerDecorator,
-  ValidationOptions,
-} from "class-validator";
-import { isValidHash, isValidPublicKey } from "src/utils/validate";
+import { IsString } from "class-validator";
+import { IsValidPublicKeyOrHash } from "src/utils/nest-validation";
 
 import { AccountService } from "./account.service";
-
-// TODO: put these in some form of utils
-export const IsValidPublicKeyOrHash = (
-  property: string,
-  validationOptions?: ValidationOptions
-) => {
-  return function (object: unknown, propertyName: string) {
-    registerDecorator({
-      name: "isValidPublicKeyOrHash",
-      target: object.constructor,
-      propertyName: propertyName,
-      constraints: [property],
-      options: validationOptions,
-      validator: {
-        validate(value: string) {
-          return isValidPublicKey(value) || isValidHash(value);
-        },
-      },
-    });
-  };
-};
 
 export class AccountByHashOrPublicKeyParamDtp {
   @IsValidPublicKeyOrHash("hashOrPublicKey", {

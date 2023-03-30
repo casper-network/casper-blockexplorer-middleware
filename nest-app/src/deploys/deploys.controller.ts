@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from "@nestjs/common";
 import { IsString } from "class-validator";
-import { IsValidHash } from "src/blocks/blocks.controller";
+import { IsValidHash } from "src/utils/nest-validation";
 
 import { DeploysService } from "./deploys.service";
 

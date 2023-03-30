@@ -4,7 +4,6 @@ import { Cache } from "cache-manager";
 import { jsonRpc } from "src/main";
 import { Peer } from "src/types/api";
 
-// TODO: figure out method types (protected, private, public, etc.)
 @Injectable()
 export class PeersService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}

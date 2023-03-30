@@ -69,7 +69,6 @@ export class BlocksService {
     return block as unknown as Block;
   }
 
-  // TODO: add sorting logic???
   async getBlocks(count = 10, orderByHeight = "desc", pageNum = 1) {
     const latestBlock = await this.getLatestBlock();
 

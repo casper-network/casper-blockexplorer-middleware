@@ -1,22 +1,16 @@
 import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
-import { Bid, ValidatorsInfoResult } from "casper-js-sdk";
+import { ValidatorsInfoResult } from "casper-js-sdk";
 import { BlocksService } from "src/blocks/blocks.service";
+import { ERA_CHECK_PERIOD_MINUTES } from "src/config";
 import { jsonRpc } from "src/main";
 import {
+  ActualBid,
+  Sort,
   ValidatorProcessed,
   ValidatorsProcessedWithStatus,
 } from "src/types/api";
-
-// TODO: move these types to better places
-export type Sort = "desc" | "asc";
-export interface ActualBid extends Bid {
-  inactive: boolean;
-}
-
-// TODO: move to const
-export const ERA_CHECK_PERIOD_MINUTES = 10;
 
 @Injectable()
 export class ValidatorsService {

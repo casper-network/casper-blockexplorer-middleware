@@ -1,4 +1,4 @@
-import { ValidatorBid, ValidatorWeight } from "casper-js-sdk";
+import { Bid, ValidatorBid, ValidatorWeight } from "casper-js-sdk";
 
 export interface Peer {
   nodeId: string;
@@ -61,4 +61,9 @@ export interface Header {
   era_id: number;
   height: number;
   protocol_version: string;
+}
+
+export type Sort = "desc" | "asc";
+export interface ActualBid extends Bid {
+  inactive: boolean;
 }
