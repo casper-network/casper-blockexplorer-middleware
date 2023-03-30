@@ -1,4 +1,5 @@
 import { registerDecorator, ValidationOptions } from "class-validator";
+
 import { isValidHash, isValidPublicKey } from "./validate";
 
 export const IsValidPublicKeyOrHash = (

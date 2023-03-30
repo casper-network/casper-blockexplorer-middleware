@@ -3,6 +3,7 @@ import { Transform } from "class-transformer";
 import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
 import { Block, Sort } from "src/types/api";
 import { IsValidHash } from "src/utils/nest-validation";
+
 import { BlocksService } from "./blocks.service";
 
 export class BlocksQueryDtp {
