@@ -14,12 +14,13 @@ export class PeersService {
     await this.fetchPeersRpc();
   }
 
-  @Cron(`*/2 * * * *`)
+  @Cron("*/2 * * * *")
   async handleCron() {
     await this.fetchPeersRpc();
   }
 
   async fetchPeersRpc() {
+    // TODO: temporary - currently determining better fix
     if (this.isFetchingPeers) {
       return;
     }

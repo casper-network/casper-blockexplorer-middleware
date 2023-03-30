@@ -2,7 +2,7 @@ import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { StatusCodes } from "http-status-codes";
-import { NODE_CACHE_LIMIT } from "src/config";
+import { BLOCK_GENERATE_INTERVAL, NODE_CACHE_LIMIT } from "src/config";
 import { jsonRpc } from "src/main";
 import { Block } from "src/types/api";
 import { ApiError } from "src/utils/ApiError";
@@ -15,7 +15,7 @@ export class BlocksService {
     await this.getLatestBlock();
   }
 
-  @Cron(`*/${30 / 2} * * * * *`)
+  @Cron(`*/${BLOCK_GENERATE_INTERVAL / 2} * * * * *`)
   async handleCron() {
     const overrideCache = true;
     await this.getLatestBlock(overrideCache);
