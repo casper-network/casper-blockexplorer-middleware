@@ -25,16 +25,16 @@ clean:
 middleware-all: middleware-install middleware-audit middleware-lint middleware-test
 
 middleware-install:
-	cd app && npm install
+	cd nest-app && npm install
 
 middleware-ci-install:
-	cd app && npm ci
+	cd nest-app && npm ci
 
 middleware-audit:
-	cd app && npm audit
+	cd nest-app && npm audit
 
 middleware-lint:
-	cd app && npm run lint
+	cd nest-app && npm run lint
 
 middleware-test:
-	cd app && npm run test
+	cd nest-app && npm run test
