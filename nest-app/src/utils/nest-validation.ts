@@ -41,3 +41,8 @@ export const IsValidHash = (
     });
   };
 };
+
+export enum ValidationError {
+  Hash = "Not a valid hash.",
+  HashOrPublicKey = "Not a valid public key or hash.",
+}

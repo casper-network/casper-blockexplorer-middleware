@@ -2,7 +2,7 @@ import { Controller, Get, Param, Query } from "@nestjs/common";
 import { Transform } from "class-transformer";
 import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
 import { Block, Sort } from "src/types/api";
-import { IsValidHash } from "src/utils/nest-validation";
+import { IsValidHash, ValidationError } from "src/utils/nest-validation";
 
 import { BlocksService } from "./blocks.service";
 
@@ -27,7 +27,7 @@ export class BlocksQueryDtp {
 }
 
 export class BlocksByHashOrHeightParamDtp {
-  @IsValidHash("hashOrHeight", { message: "Not a valid hash." })
+  @IsValidHash("hashOrHeight", { message: ValidationError.Hash })
   @IsString()
   public hashOrHeight: string;
 }

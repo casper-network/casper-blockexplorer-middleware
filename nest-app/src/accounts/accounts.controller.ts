@@ -1,13 +1,16 @@
 import { Controller, Get, Param } from "@nestjs/common";
 import { StoredValue } from "casper-js-sdk";
 import { IsString } from "class-validator";
-import { IsValidPublicKeyOrHash } from "src/utils/nest-validation";
+import {
+  IsValidPublicKeyOrHash,
+  ValidationError,
+} from "src/utils/nest-validation";
 
 import { AccountsService } from "./accounts.service";
 
 export class AccountByHashOrPublicKeyParamDtp {
   @IsValidPublicKeyOrHash("hashOrPublicKey", {
-    message: "Not a valid public key or hash.",
+    message: ValidationError.HashOrPublicKey,
   })
   @IsString()
   public hashOrPublicKey: string;

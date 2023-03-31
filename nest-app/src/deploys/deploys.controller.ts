@@ -1,11 +1,11 @@
 import { Controller, Get, Param } from "@nestjs/common";
 import { IsString } from "class-validator";
-import { IsValidHash } from "src/utils/nest-validation";
+import { IsValidHash, ValidationError } from "src/utils/nest-validation";
 
 import { DeploysService } from "./deploys.service";
 
 export class DeploysByHashParamsDtp {
-  @IsValidHash("hash", { message: "Not a valid hash." })
+  @IsValidHash("hash", { message: ValidationError.Hash })
   @IsString()
   public hash: string;
 }
