@@ -1,16 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { CLValueParsers, JsonDeploy, JsonExecutionResult } from "casper-js-sdk";
+import { CLValueParsers } from "casper-js-sdk";
 import { jsonRpc } from "src/main";
-
-import format from "date-fns/format";
-import TimeAgo from "javascript-time-ago";
-import en from "javascript-time-ago/locale/en";
-
-TimeAgo.addDefaultLocale(en);
-
-const timeAgo = new TimeAgo("en-US");
-
-export const defaultDateFormat = "MMM do yyyy, h:mm:ss a";
 
 // TODO: move all these types
 export enum DeployStatus {
@@ -129,22 +119,12 @@ export const determineDeploySessionData: (
   return { action, deployType, amount };
 };
 
-export const formatDate = (date: Date) => {
-  const readableTimestamp = format(date, defaultDateFormat);
-  return readableTimestamp;
-};
-
-export const formatTimeAgo = (date: Date) => {
-  const age = timeAgo.format(date, "round");
-  return age;
-};
-
 @Injectable()
 export class DeploysService {
+  // TODO: move this return type somewhere?
   async getDeploy(hash: string): Promise<{
     timestamp: number;
-    timeSince: string;
-    readableTimestamp: string;
+    dateTime: Date | string;
     deployHash: string;
     blockHash: string;
     publicKey: string;
@@ -190,13 +170,9 @@ export class DeploysService {
 
     const dateTime = new Date(timestamp);
 
-    const timeSince = formatTimeAgo(dateTime);
-    const readableTimestamp = formatDate(dateTime);
-
     return {
       timestamp,
-      timeSince,
-      readableTimestamp,
+      dateTime,
       deployHash: deploy.hash,
       blockHash,
       publicKey,
