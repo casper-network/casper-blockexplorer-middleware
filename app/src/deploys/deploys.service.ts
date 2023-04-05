@@ -61,7 +61,5 @@ export class DeploysService {
         execution_results: executionResults,
       }),
     };
-
-    // return { ...deploy, execution_results };
   }
 }

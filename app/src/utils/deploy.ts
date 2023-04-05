@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import { CLValueParsers } from "casper-js-sdk";
 import {
   DeployStatus,
@@ -45,7 +46,7 @@ export const determineDeploySessionData: (
   amount?: string;
 } = (deploySession, deployStatus) => {
   let sessionMap: Map<unknown, unknown>;
-  let action: string = "N/A";
+  let action = "N/A";
   let deployType: string | undefined;
 
   if (isWasmDeploy(deploySession)) {
@@ -61,11 +62,11 @@ export const determineDeploySessionData: (
   } else if (isEntryPointDeploy(deploySession)) {
     const typedDeploySession = deploySession as JsonDeployEntryPointSession;
 
-    if (!!typedDeploySession.StoredContractByHash) {
+    if (typedDeploySession.StoredContractByHash) {
       deployType = "StoredContractByHash";
       action = typedDeploySession.StoredContractByHash.entry_point;
       sessionMap = new Map(typedDeploySession.StoredContractByHash.args);
-    } else if (!!typedDeploySession.StoredVersionedContractByName) {
+    } else if (typedDeploySession.StoredVersionedContractByName) {
       deployType = "StoredVersionContractByName";
       action = typedDeploySession.StoredVersionedContractByName.entry_point;
       sessionMap = new Map(

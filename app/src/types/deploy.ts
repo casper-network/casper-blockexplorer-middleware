@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 export enum DeployStatus {
   Success = "Success",
   Failed = "Failed",
