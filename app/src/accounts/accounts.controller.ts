@@ -31,7 +31,11 @@ export class AccountsController {
   ): Promise<StoredValue["Account"]> {
     const { hashOrPublicKey } = params;
 
+    console.log({ hashOrPublicKey });
+
     const account = await this.accountsService.getAccount(hashOrPublicKey);
+
+    console.log({ account });
 
     return account;
   }
