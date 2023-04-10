@@ -1,14 +1,65 @@
 import { Injectable } from "@nestjs/common";
-import { JsonDeploy, JsonExecutionResult } from "casper-js-sdk";
+import { CLValueParsers } from "casper-js-sdk";
 import { jsonRpc } from "src/main";
+import { DeployStatus, GetDeploy } from "src/types/deploy";
+import {
+  determineDeploySessionData,
+  JsonDeploySession,
+} from "src/utils/deploy";
 
 @Injectable()
 export class DeploysService {
-  async getDeploy(
-    hash: string
-  ): Promise<JsonDeploy & { execution_results: JsonExecutionResult[] }> {
-    const { deploy, execution_results } = await jsonRpc.getDeployInfo(hash);
+  async getDeploy(hash: string): Promise<GetDeploy> {
+    const { deploy, execution_results: executionResults } =
+      await jsonRpc.getDeployInfo(hash);
 
-    return { ...deploy, execution_results };
+    // @ts-ignore
+    const paymentMap = new Map(deploy.payment.ModuleBytes?.args);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    const paymentAmount = CLValueParsers.fromJSON(paymentMap.get("amount"))
+      .unwrap()
+      .value()
+      .toString() as string;
+
+    const { timestamp, account: publicKey } = deploy.header;
+
+    const { block_hash: blockHash, result: executionResult } =
+      executionResults[0];
+
+    const status = executionResult.Success
+      ? DeployStatus.Success
+      : DeployStatus.Failed;
+
+    const deploySession = deploy.session as unknown as JsonDeploySession;
+
+    const { action, deployType, amount } = determineDeploySessionData(
+      deploySession,
+      status
+    );
+
+    const cost = executionResult.Success
+      ? executionResult.Success.cost
+      : executionResult.Failure?.cost ?? 0;
+
+    const dateTime = new Date(timestamp);
+
+    return {
+      timestamp,
+      dateTime,
+      deployHash: deploy.hash,
+      blockHash,
+      publicKey,
+      action,
+      deployType,
+      amount,
+      paymentAmount,
+      cost: cost.toString(),
+      status,
+      rawDeploy: JSON.stringify({
+        deploy,
+        execution_results: executionResults,
+      }),
+    };
   }
 }
