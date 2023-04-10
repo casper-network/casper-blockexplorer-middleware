@@ -9,3 +9,7 @@ export const getAccountStub = () => ({
   associatedKeys: [],
   actionThresholds: { deployment: 1, keyManagement: 1 },
 });
+
+export const getBalanceStub = () => "123456789";
+export const balanceUref =
+  "uref-7e38074b9fe8435ddd12ad892a3a06ecedc0cd71194fa35d061726e21743865b-007";

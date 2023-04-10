@@ -44,6 +44,8 @@ export class AccountsController {
   async getAccountBalance(@Param() params: AccountBalanceParamDtp) {
     const { uref } = params;
 
+    console.log({ uref });
+
     const balance = await this.accountsService.getBalance(uref);
 
     return { balance };

@@ -1,7 +1,12 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { StoredValue } from "casper-js-sdk";
 import { AccountsController } from "./accounts.controller";
 import { AccountsService } from "./accounts.service";
-import { getAccountStub } from "./stubs/accounts.stub";
+import {
+  balanceUref,
+  getAccountStub,
+  getBalanceStub,
+} from "./stubs/accounts.stub";
 
 jest.mock("./accounts.service");
 
@@ -22,10 +27,10 @@ describe("AccountsController", () => {
   });
 
   describe("getAccount", () => {
-    let account: any;
+    let account;
 
-    beforeEach(() => {
-      account = accountsService.getAccount(getAccountStub()._accountHash);
+    beforeEach(async () => {
+      account = await accountsService.getAccount(getAccountStub()._accountHash);
     });
 
     it("should be called with hashOrPublicKey", () => {
@@ -36,6 +41,22 @@ describe("AccountsController", () => {
 
     it("should return account", () => {
       expect(account).toEqual(getAccountStub());
+    });
+  });
+
+  describe("getBalamce", () => {
+    let balance: string;
+
+    beforeEach(async () => {
+      balance = await accountsService.getBalance(balanceUref);
+    });
+
+    it("should be called with uref", () => {
+      expect(accountsService.getBalance).toHaveBeenCalledWith(balanceUref);
+    });
+
+    it("should return account balance", () => {
+      expect(balance).toEqual(getBalanceStub());
     });
   });
 });
