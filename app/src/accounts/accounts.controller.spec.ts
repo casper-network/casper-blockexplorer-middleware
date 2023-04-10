@@ -1,5 +1,4 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { StoredValue } from "casper-js-sdk";
 import { AccountsController } from "./accounts.controller";
 import { AccountsService } from "./accounts.service";
 import {
