@@ -2,6 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { Block } from "src/types/api";
 import { BlocksController } from "./blocks.controller";
 import { BlocksService } from "./blocks.service";
+import { getBlocksStub } from "./stubs/blocks.stub";
 
 jest.mock("./blocks.service");
 
@@ -30,6 +31,10 @@ describe("BlocksController", () => {
 
     beforeEach(async () => {
       blocks = await blocksService.getBlocks();
+    });
+
+    it("should return blocks", () => {
+      expect(blocks).toEqual(getBlocksStub());
     });
   });
 });

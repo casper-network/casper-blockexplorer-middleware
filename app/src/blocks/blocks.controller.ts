@@ -40,7 +40,11 @@ export class BlocksController {
   async getBlocks(@Query() query: BlocksQueryDtp) {
     const { count, orderBy, pageNum } = query;
 
-    const blocks = this.blocksService.getBlocks(count, orderBy, pageNum);
+    // TODO: we should be typing the return value here so it's easy to test
+    const blocks = await this.blocksService.getBlocks(count, orderBy, pageNum);
+
+    console.log({ blocks });
+    console.log({ block: blocks.blocks[0] });
 
     return blocks;
   }

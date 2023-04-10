@@ -1,5 +1,3 @@
-import { StoredValue } from "casper-js-sdk";
-
 export const getAccountStub = () => ({
   _accountHash:
     "account-hash-e386a6e2d67ab4c7af524f0b7f60fa77fe420a189309b613f359ccd83c27807a",
