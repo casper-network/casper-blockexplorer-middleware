@@ -4,7 +4,7 @@ import { AccountsService } from "./accounts.service";
 import {
   balanceUref,
   getAccountStub,
-  getBalanceStub,
+  balanceStub,
 } from "./stubs/accounts.stub";
 
 jest.mock("./accounts.service");
@@ -55,7 +55,7 @@ describe("AccountsController", () => {
     });
 
     it("should return account balance", () => {
-      expect(balance).toEqual(getBalanceStub());
+      expect(balance).toEqual(balanceStub);
     });
   });
 });
