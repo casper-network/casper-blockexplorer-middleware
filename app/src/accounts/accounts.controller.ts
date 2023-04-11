@@ -31,11 +31,7 @@ export class AccountsController {
   ): Promise<StoredValue["Account"]> {
     const { hashOrPublicKey } = params;
 
-    console.log({ hashOrPublicKey });
-
     const account = await this.accountsService.getAccount(hashOrPublicKey);
-
-    console.log({ account });
 
     return account;
   }
@@ -43,8 +39,6 @@ export class AccountsController {
   @Get("balance/:uref")
   async getAccountBalance(@Param() params: AccountBalanceParamDtp) {
     const { uref } = params;
-
-    console.log({ uref });
 
     const balance = await this.accountsService.getBalance(uref);
 
