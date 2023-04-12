@@ -1,4 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
+
 import {
   getCurrentEraValidatorsStub,
   getCurrentEraValidatorStatusStub,
@@ -9,7 +10,6 @@ import { ValidatorsService } from "./validators.service";
 jest.mock("./validators.service");
 
 describe("PeersController", () => {
-  let validatorsController: ValidatorsController;
   let validatorsService: ValidatorsService;
 
   beforeEach(async () => {
@@ -19,7 +19,6 @@ describe("PeersController", () => {
       providers: [ValidatorsService],
     }).compile();
 
-    validatorsController = module.get(ValidatorsController);
     validatorsService = module.get(ValidatorsService);
     jest.clearAllMocks();
   });

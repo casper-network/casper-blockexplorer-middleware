@@ -1,5 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { Block } from "src/types/api";
+
 import { BlocksController } from "./blocks.controller";
 import { BlocksService } from "./blocks.service";
 import {
@@ -11,7 +12,6 @@ import {
 jest.mock("./blocks.service");
 
 describe("BlocksController", () => {
-  let blocksController: BlocksController;
   let blocksService: BlocksService;
 
   beforeEach(async () => {
@@ -21,7 +21,6 @@ describe("BlocksController", () => {
       providers: [BlocksService],
     }).compile();
 
-    blocksController = module.get(BlocksController);
     blocksService = module.get(BlocksService);
     jest.clearAllMocks();
   });

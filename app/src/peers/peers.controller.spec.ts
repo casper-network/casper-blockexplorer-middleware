@@ -1,4 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
+
 import { PeersController } from "./peers.controller";
 import { PeersService } from "./peers.service";
 import { getPeersStub } from "./stubs/peers.stub";
@@ -6,7 +7,6 @@ import { getPeersStub } from "./stubs/peers.stub";
 jest.mock("./peers.service");
 
 describe("PeersController", () => {
-  let peersController: PeersController;
   let peersService: PeersService;
 
   beforeEach(async () => {
@@ -16,7 +16,6 @@ describe("PeersController", () => {
       providers: [PeersService],
     }).compile();
 
-    peersController = module.get(PeersController);
     peersService = module.get(PeersService);
     jest.clearAllMocks();
   });

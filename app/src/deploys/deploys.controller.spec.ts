@@ -1,5 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { GetDeploy } from "src/types/deploy";
+
 import { DeploysController } from "./deploys.controller";
 import { DeploysService } from "./deploys.service";
 import { getDeployStub } from "./stubs/deploys.stub";
@@ -7,7 +8,6 @@ import { getDeployStub } from "./stubs/deploys.stub";
 jest.mock("./deploys.service");
 
 describe("DeploysController", () => {
-  let deploysController: DeploysController;
   let deploysService: DeploysService;
 
   beforeEach(async () => {
@@ -17,7 +17,6 @@ describe("DeploysController", () => {
       providers: [DeploysService],
     }).compile();
 
-    deploysController = module.get(DeploysController);
     deploysService = module.get(DeploysService);
     jest.clearAllMocks();
   });

@@ -1,16 +1,16 @@
 import { Test, TestingModule } from "@nestjs/testing";
+
 import { AccountsController } from "./accounts.controller";
 import { AccountsService } from "./accounts.service";
 import {
+  balanceStub,
   balanceUref,
   getAccountStub,
-  balanceStub,
 } from "./stubs/accounts.stub";
 
 jest.mock("./accounts.service");
 
 describe("AccountsController", () => {
-  let accountsContoller: AccountsController;
   let accountsService: AccountsService;
 
   beforeEach(async () => {
@@ -20,7 +20,6 @@ describe("AccountsController", () => {
       providers: [AccountsService],
     }).compile();
 
-    accountsContoller = module.get(AccountsController);
     accountsService = module.get(AccountsService);
     jest.clearAllMocks();
   });
