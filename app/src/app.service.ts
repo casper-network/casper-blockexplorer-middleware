@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-var-requires: "off" */
 import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
@@ -35,7 +36,6 @@ export class AppService {
   }
 
   async getVersion() {
-    /* tslint:disable no-var-requires */
     const hash = require("child_process")
       .execSync("git rev-parse HEAD")
       .toString()
