@@ -12,4 +12,11 @@ export class AppController {
 
     return status;
   }
+
+  @Get("version")
+  async getVersion() {
+    const version = await this.appService.getVersion();
+
+    return version;
+  }
 }

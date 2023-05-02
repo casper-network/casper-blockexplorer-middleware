@@ -4,6 +4,7 @@ import { Cache } from "cache-manager";
 import { GetStatusResult } from "casper-js-sdk";
 
 import { jsonRpc } from "./main";
+import { version } from "../package.json";
 
 @Injectable()
 export class AppService {
@@ -31,5 +32,14 @@ export class AppService {
     await this.cacheManager.set("status", status);
 
     return status;
+  }
+
+  async getVersion() {
+    const hash = require("child_process")
+      .execSync("git rev-parse HEAD")
+      .toString()
+      .trim();
+
+    return { hash, version };
   }
 }
