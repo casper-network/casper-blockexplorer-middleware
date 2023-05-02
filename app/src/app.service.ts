@@ -35,6 +35,7 @@ export class AppService {
   }
 
   async getVersion() {
+    /* tslint:disable no-var-requires */
     const hash = require("child_process")
       .execSync("git rev-parse HEAD")
       .toString()
