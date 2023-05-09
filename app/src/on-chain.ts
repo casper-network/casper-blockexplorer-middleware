@@ -15,6 +15,9 @@ export class OnChain {
       // use `sidecar.getLatestBlock`
 
       const { block: latestBlock } = await this.sidecar.latestBlock();
+
+      // TODO: if at any point this (or any sidecar method) returns null, undefined, error, etc.
+      // then we want to set this.isSidecarRunning = false + automatically fetch using jsonRpc
       return latestBlock;
     }
 
