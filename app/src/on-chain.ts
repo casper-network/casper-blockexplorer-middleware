@@ -8,7 +8,7 @@ export class OnChain {
     public isSidecarRunning: boolean = false
   ) {}
 
-  async testGetLatestBlock() {
+  async getLatestBlock() {
     // TODO: need to verify that the response type is the same
     // or modify ReturnType based on if isSidecarRunning
     if (this.isSidecarRunning) {

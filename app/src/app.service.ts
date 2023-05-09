@@ -15,13 +15,12 @@ export class AppService {
     // TODO: should probably check if sidecar is available here
 
     const isSidecarRunning = await sidecar.latestBlock();
-    console.log({ isSidecarRunning });
     console.log("pre", onChain.isSidecarRunning);
 
     // TODO: figure out best way to check if it's actually running...
     // What should we check for?
     if (isSidecarRunning.block.hash) {
-      console.log("block hash!!!!");
+      console.log("sidecar is indeed running,set isSidecarRunning = true");
       onChain.isSidecarRunning = true;
     }
 
