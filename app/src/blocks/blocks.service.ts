@@ -28,6 +28,8 @@ export class BlocksService {
       return cachedLatestBlock;
     }
 
+    // TODO: replace this with onChain.getLatestBlock()
+    // Will return exact same block shape regardless of if sidecar is used
     const { block } = await jsonRpc.getLatestBlockInfo();
 
     if (!block) {
