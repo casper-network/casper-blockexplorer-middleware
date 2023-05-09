@@ -4,6 +4,8 @@ import { CasperServiceByJsonRPC } from "casper-js-sdk";
 
 import { AppModule } from "./app.module";
 import { nodeManager } from "./node-manager";
+import { OnChain } from "./on-chain";
+import { Sidecar } from "./sidecar";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -17,3 +19,7 @@ bootstrap();
 export const jsonRpc = new CasperServiceByJsonRPC(
   nodeManager.getActiveNode().url
 );
+
+export const sidecar = new Sidecar("http://3.136.227.9:18888");
+
+export const onChain = new OnChain(jsonRpc, sidecar);

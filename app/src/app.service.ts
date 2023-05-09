@@ -4,7 +4,7 @@ import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { GetStatusResult } from "casper-js-sdk";
 
-import { jsonRpc } from "./main";
+import { jsonRpc, onChain, sidecar } from "./main";
 import { version } from "../package.json";
 
 @Injectable()
@@ -12,6 +12,19 @@ export class AppService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
   async onModuleInit() {
+    // TODO: should probably check if sidecar is available here
+
+    const isSidecarRunning = await sidecar.latestBlock();
+    console.log({ isSidecarRunning });
+    console.log("pre", onChain.isSidecarRunning);
+
+    // TODO: figure out best way to check if it's actually running...
+    // What should we check for?
+    if (isSidecarRunning.block.hash) {
+      console.log("block hash!!!!");
+      onChain.isSidecarRunning = true;
+    }
+
     await this.getStatus();
   }
 
@@ -22,6 +35,8 @@ export class AppService {
   }
 
   async getStatus(overrideCache?: boolean) {
+    console.log("side car set to isSidecarRunning", onChain.isSidecarRunning);
+
     const cachedStatus = await this.cacheManager.get<GetStatusResult>("status");
 
     if (cachedStatus && !overrideCache) {
