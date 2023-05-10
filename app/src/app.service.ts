@@ -12,23 +12,25 @@ export class AppService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
   async onModuleInit() {
-    // TODO: should probably check if sidecar is available here
-
     const isSidecarRunning = await sidecar.latestBlock();
     console.log("pre", onChain.isSidecarRunning);
 
-    // TODO: figure out best way to check if it's actually running...
-    // What should we check for?
-    if (isSidecarRunning.block.hash) {
-      console.log("sidecar is indeed running,set isSidecarRunning = true");
-      onChain.isSidecarRunning = true;
-    }
+    onChain.isSidecarRunning = !!isSidecarRunning.block.hash;
 
     await this.getStatus();
   }
 
+  @Cron("*/10 * * * *")
+  async handleSidecarCron() {
+    // TODO: should we put this into a util method (since it's also called above)?
+    const isSidecarRunning = await sidecar.latestBlock();
+    console.log("pre", onChain.isSidecarRunning);
+
+    onChain.isSidecarRunning = !!isSidecarRunning.block.hash;
+  }
+
   @Cron("*/30 * * * *")
-  async handleCron() {
+  async handleStatusCron() {
     const overrideCache = true;
     await this.getStatus(overrideCache);
   }
