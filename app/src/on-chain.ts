@@ -13,8 +13,14 @@ export class OnChain {
     // or modify ReturnType based on if isSidecarRunning
     if (this.isSidecarRunning) {
       // use `sidecar.getLatestBlock`
+      console.log("trying sidecar in OnChain");
 
       const { block: latestBlock } = await this.sidecar.latestBlock();
+
+      if (latestBlock === undefined || latestBlock === null) {
+        console.log("no result");
+        return;
+      }
 
       // TODO: if at any point this (or any sidecar method) returns null, undefined, error, etc.
       // then we want to set this.isSidecarRunning = false + automatically fetch using jsonRpc
@@ -22,6 +28,9 @@ export class OnChain {
     }
 
     const { block: latestBlock } = await this.jsonRpc.getLatestBlockInfo();
+
+    console.log("defaulted back to jsonRPC");
+
     return latestBlock;
   }
 }

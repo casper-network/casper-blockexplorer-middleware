@@ -13,7 +13,6 @@ export class AppService {
 
   async onModuleInit() {
     const isSidecarRunning = await sidecar.latestBlock();
-    console.log("pre", onChain.isSidecarRunning);
 
     onChain.isSidecarRunning = !!isSidecarRunning.block.hash;
 
@@ -22,9 +21,7 @@ export class AppService {
 
   @Cron("*/10 * * * *")
   async handleSidecarCron() {
-    // TODO: should we put this into a util method (since it's also called above)?
     const isSidecarRunning = await sidecar.latestBlock();
-    console.log("pre", onChain.isSidecarRunning);
 
     onChain.isSidecarRunning = !!isSidecarRunning.block.hash;
   }
