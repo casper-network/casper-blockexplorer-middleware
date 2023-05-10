@@ -13,8 +13,6 @@ export class Sidecar {
     try {
       const result = await this.api.get<GetBlockResult>("/block");
 
-      console.log({ result });
-
       // TODO: we could create a helper function to automatically check for this for every sidecar method
       // to always be checking to see if sidecar is running
       // and then call corresponding onChain method and set onChain.isSidecarRunning = false;

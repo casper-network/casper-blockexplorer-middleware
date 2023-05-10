@@ -14,7 +14,8 @@ export class AppService {
   async onModuleInit() {
     const isSidecarRunning = await sidecar.latestBlock();
 
-    onChain.isSidecarRunning = !!isSidecarRunning.block.hash;
+    onChain.isSidecarRunning =
+      isSidecarRunning === null ? false : !!isSidecarRunning.block.hash;
 
     await this.getStatus();
   }
