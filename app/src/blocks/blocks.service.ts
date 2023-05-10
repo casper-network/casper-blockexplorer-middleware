@@ -3,7 +3,7 @@ import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { StatusCodes } from "http-status-codes";
 import { BLOCK_GENERATE_INTERVAL, NODE_CACHE_LIMIT } from "src/config";
-import { jsonRpc } from "src/main";
+import { jsonRpc, onChain } from "src/main";
 import { Block } from "src/types/api";
 import { ApiError } from "src/utils/ApiError";
 
@@ -30,7 +30,8 @@ export class BlocksService {
 
     // TODO: replace this with onChain.getLatestBlock()
     // Will return exact same block shape regardless of if sidecar is used
-    const { block } = await jsonRpc.getLatestBlockInfo();
+    // const { block } = await jsonRpc.getLatestBlockInfo();
+    const block = await onChain.getLatestBlock();
 
     if (!block) {
       throw new ApiError(StatusCodes.NOT_FOUND, "Latest block not found.");
