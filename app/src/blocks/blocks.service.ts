@@ -47,7 +47,7 @@ export class BlocksService {
 
     if (cachedBlock) return cachedBlock;
 
-    const { block } = await onChain.getBlockByHeight(height);
+    const block = await onChain.getBlockByHeight(height);
 
     if (!block)
       throw new ApiError(StatusCodes.NOT_FOUND, "Block by height not found.");
@@ -59,7 +59,7 @@ export class BlocksService {
   }
 
   async getBlock(blockHash: string) {
-    const { block } = await onChain.getBlockByHash(blockHash);
+    const block = await onChain.getBlockByHash(blockHash);
 
     if (!block)
       throw new ApiError(StatusCodes.NOT_FOUND, "Block by hash not found.");

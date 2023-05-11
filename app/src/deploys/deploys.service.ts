@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { CLValueParsers } from "casper-js-sdk";
-import { jsonRpc } from "src/main";
+import { jsonRpc, onChain } from "src/main";
 import { DeployStatus, GetDeploy } from "src/types/deploy";
 import {
   determineDeploySessionData,
@@ -10,8 +10,14 @@ import {
 @Injectable()
 export class DeploysService {
   async getDeploy(hash: string): Promise<GetDeploy> {
-    const { deploy, execution_results: executionResults } =
-      await jsonRpc.getDeployInfo(hash);
+    console.log("deploy hash", hash);
+
+    // const { deploy, execution_results: executionResults } =
+    // await jsonRpc.getDeployInfo(hash);
+
+    const { deploy, executionResults } = await onChain.getDeploy(hash);
+
+    console.log({ deploy, executionResults });
 
     // @ts-ignore
     const paymentMap = new Map(deploy.payment.ModuleBytes?.args);
@@ -32,6 +38,9 @@ export class DeploysService {
       : DeployStatus.Failed;
 
     const deploySession = deploy.session as unknown as JsonDeploySession;
+
+    console.log({ deploySession });
+    console.log({ status });
 
     const { action, deployType, amount } = determineDeploySessionData(
       deploySession,

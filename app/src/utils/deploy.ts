@@ -49,6 +49,8 @@ export const determineDeploySessionData: (
   let action = "N/A";
   let deployType: string | undefined;
 
+  console.log({ deploySession });
+
   if (isWasmDeploy(deploySession)) {
     action = "WASM deploy";
     sessionMap = new Map(
@@ -85,11 +87,18 @@ export const determineDeploySessionData: (
     return { action };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const amount = CLValueParsers.fromJSON(sessionMap.get("amount"))
-    .unwrap()
-    .value()
-    .toString() as string;
+  // console.log({ deployType });
+  // console.log({ action });
+  // console.log({ sessionMap });
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const amount = sessionMap.get("amount")
+    ? (CLValueParsers.fromJSON(sessionMap.get("amount"))
+        .unwrap()
+        .value()
+        .toString() as string)
+    : "0";
+
+  // TODO: figure out what the heck is doing on with amount
   return { action, deployType, amount };
 };

@@ -10,7 +10,7 @@ export class OnChain {
 
   async getLatestBlock() {
     if (this.isSidecarRunning) {
-      console.log("trying sidecar in OnChain");
+      // console.log("trying sidecar in OnChain");
 
       try {
         const {
@@ -53,6 +53,8 @@ export class OnChain {
           data: { block },
         } = await this.sidecar.getBlockByHeight(height);
 
+        // console.log("block in height", block);
+
         if (status !== 200 || block === undefined || block === null) {
           this.isSidecarRunning = false;
           return this.getBlockByHeight(height);
@@ -60,7 +62,7 @@ export class OnChain {
 
         return block;
       } catch (e) {
-        console.log("Error requesting block by height from sidecar.", e);
+        console.log("Error requesting block by height from sidecar.");
 
         this.isSidecarRunning = false;
         return this.getBlockByHeight(height);
@@ -82,6 +84,8 @@ export class OnChain {
           data: { block },
         } = await this.sidecar.getBlockByHash(hash);
 
+        // console.log("block in hash", block);
+
         if (status !== 200 || block === undefined || block === null) {
           this.isSidecarRunning = false;
           return this.getBlockByHash(hash);
@@ -89,7 +93,7 @@ export class OnChain {
 
         return block;
       } catch (e) {
-        console.log("Error requesting block by hash from sidecar.", e);
+        console.log("Error requesting block by hash from sidecar.");
 
         this.isSidecarRunning = false;
         return this.getBlockByHash(hash);
@@ -101,5 +105,48 @@ export class OnChain {
     console.log("defaulted back to jsonRPC for block by hash");
 
     return block;
+  }
+
+  async getDeploy(hash: string) {
+    if (this.isSidecarRunning) {
+      // try {
+      const {
+        status,
+        data: { deploy_accepted, deploy_processed },
+      } = await this.sidecar.getDeploy(hash);
+
+      const executionResults = [
+        {
+          block_hash: deploy_processed.block_hash,
+          result: deploy_processed.execution_result,
+        },
+      ];
+
+      // console.log("block in hash", block);
+
+      if (
+        status !== 200 ||
+        deploy_accepted === undefined ||
+        deploy_accepted === null
+      ) {
+        this.isSidecarRunning = false;
+        return this.getDeploy(hash);
+      }
+
+      return { deploy: deploy_accepted, executionResults };
+      // } catch (e) {
+      //   console.log("Error requesting deploy by hash from sidecar.");
+
+      //   this.isSidecarRunning = false;
+      //   return this.getDeploy(hash);
+      // }
+    }
+
+    const { deploy, execution_results: executionResults } =
+      await this.jsonRpc.getDeployInfo(hash);
+
+    console.log("defaulted back to jsonRPC for deploy by hash");
+
+    return { deploy, executionResults };
   }
 }

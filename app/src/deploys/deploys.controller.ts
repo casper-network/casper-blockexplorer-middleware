@@ -18,6 +18,8 @@ export class DeploysController {
   async getDeployByHash(@Param() params: DeploysByHashParamsDtp) {
     const { hash } = params;
 
+    console.log({ params });
+
     const deploy = await this.deploysService.getDeploy(hash);
 
     return deploy;
