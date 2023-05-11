@@ -12,19 +12,18 @@ export class AppService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
   async onModuleInit() {
-    const isSidecarRunning = await sidecar.latestBlock();
+    const isSidecarRunning = await sidecar.getIsSidecarRunning();
 
-    onChain.isSidecarRunning =
-      isSidecarRunning === null ? false : !!isSidecarRunning.block.hash;
+    onChain.isSidecarRunning = isSidecarRunning;
 
     await this.getStatus();
   }
 
   @Cron("*/10 * * * *")
   async handleSidecarCron() {
-    const isSidecarRunning = await sidecar.latestBlock();
+    const isSidecarRunning = await sidecar.getIsSidecarRunning();
 
-    onChain.isSidecarRunning = !!isSidecarRunning.block.hash;
+    onChain.isSidecarRunning = isSidecarRunning;
   }
 
   @Cron("*/30 * * * *")

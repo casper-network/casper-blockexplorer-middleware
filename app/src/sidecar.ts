@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import { GetBlockResult, JsonBlock } from "casper-js-sdk";
+import { GetBlockResult } from "casper-js-sdk";
 import { onChain } from "./main";
 
 export class Sidecar {
@@ -9,7 +9,23 @@ export class Sidecar {
     this.api = axios.create({ baseURL: url });
   }
 
-  public async latestBlock() {
+  async getIsSidecarRunning() {
+    try {
+      const { status } = await this.api.get("/block");
+
+      if (status !== 200) {
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      console.log("Error checking if sidecar is alive.", e);
+
+      return false;
+    }
+  }
+
+  async latestBlock() {
     try {
       const result = await this.api.get<GetBlockResult>("/block");
 
