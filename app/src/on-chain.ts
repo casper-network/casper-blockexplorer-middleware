@@ -14,13 +14,28 @@ export class OnChain {
     if (this.isSidecarRunning) {
       console.log("trying sidecar in OnChain");
 
-      const { block: latestBlock } = await this.sidecar.latestBlock();
+      try {
+        const {
+          status,
+          data: { block: latestBlock },
+        } = await this.sidecar.latestBlock();
 
-      if (latestBlock === undefined || latestBlock === null) {
-        return;
+        if (
+          status !== 200 ||
+          latestBlock === undefined ||
+          latestBlock === null
+        ) {
+          this.isSidecarRunning = false;
+          return this.getLatestBlock();
+        }
+
+        return latestBlock;
+      } catch (e) {
+        console.log("Error requesting latest block from sidecar.", e);
+
+        this.isSidecarRunning = false;
+        this.getLatestBlock();
       }
-
-      return latestBlock;
     }
 
     const { block: latestBlock } = await this.jsonRpc.getLatestBlockInfo();
