@@ -29,4 +29,16 @@ export class Sidecar {
 
     return result;
   }
+
+  async getBlockByHeight(blockHeight: number) {
+    const result = await this.api.get<GetBlockResult>(`/block/${blockHeight}`);
+
+    return result;
+  }
+
+  async getBlockByHash(blockHash: string) {
+    const result = await this.api.get<GetBlockResult>(`/block/${blockHash}`);
+
+    return result;
+  }
 }
