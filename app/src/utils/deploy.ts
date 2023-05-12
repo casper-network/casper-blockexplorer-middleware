@@ -49,7 +49,10 @@ export const determineDeploySessionData: (
   let action = "N/A";
   let deployType: string | undefined;
 
-  console.log({ deploySession });
+  console.log(
+    "deploy session args",
+    (deploySession as JsonDeployWasmSession).ModuleBytes.args
+  );
 
   if (isWasmDeploy(deploySession)) {
     action = "WASM deploy";
@@ -87,6 +90,13 @@ export const determineDeploySessionData: (
     return { action };
   }
 
+  // payment args [
+  //   [
+  //     'amount',
+  //     { cl_type: 'U512', bytes: '0500d0ed902e', parsed: '200000000000' }
+  //   ]
+  // ]
+
   // console.log({ deployType });
   // console.log({ action });
   // console.log({ sessionMap });
@@ -99,6 +109,6 @@ export const determineDeploySessionData: (
         .toString() as string)
     : "0";
 
-  // TODO: figure out what the heck is doing on with amount
+  // TODO: figure out what the heck is going on with amount
   return { action, deployType, amount };
 };

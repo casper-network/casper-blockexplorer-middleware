@@ -17,7 +17,7 @@ async function bootstrap() {
 bootstrap();
 
 export const jsonRpc = new CasperServiceByJsonRPC(
-  nodeManager.getActiveNode().url
+  "http://3.136.227.9:7777/rpc"
 );
 
 // TODO: replace 3.136.227.9 with nodeManager.getActiveNode().url

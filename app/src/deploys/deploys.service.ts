@@ -12,10 +12,10 @@ export class DeploysService {
   async getDeploy(hash: string): Promise<GetDeploy> {
     console.log("deploy hash", hash);
 
-    // const { deploy, execution_results: executionResults } =
-    // await jsonRpc.getDeployInfo(hash);
+    const { deploy, execution_results: executionResults } =
+      await jsonRpc.getDeployInfo(hash);
 
-    const { deploy, executionResults } = await onChain.getDeploy(hash);
+    // const { deploy, executionResults } = await onChain.getDeploy(hash);
 
     console.log({ deploy, executionResults });
 
@@ -28,6 +28,9 @@ export class DeploysService {
       .value()
       .toString() as string;
 
+    console.log("payment args", deploy.payment.ModuleBytes?.args);
+    console.log({ paymentAmount });
+
     const { timestamp, account: publicKey } = deploy.header;
 
     const { block_hash: blockHash, result: executionResult } =
@@ -38,9 +41,6 @@ export class DeploysService {
       : DeployStatus.Failed;
 
     const deploySession = deploy.session as unknown as JsonDeploySession;
-
-    console.log({ deploySession });
-    console.log({ status });
 
     const { action, deployType, amount } = determineDeploySessionData(
       deploySession,

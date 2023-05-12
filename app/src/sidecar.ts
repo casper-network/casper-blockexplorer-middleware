@@ -50,9 +50,8 @@ export class Sidecar {
     // TODO: need to type this return
     const result = await this.api.get(`/deploy/${hash}`);
 
-    console.log("deploy results", result);
-
-    console.log("exec results", result.data.deploy_processed.execution_result);
+    // console.log("deploy results", result.data);
+    // console.log("exec results", result.data.deploy_processed.execution_result);
 
     return result;
   }
