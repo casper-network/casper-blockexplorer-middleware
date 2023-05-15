@@ -3,7 +3,7 @@ import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { StatusCodes } from "http-status-codes";
 import { BLOCK_GENERATE_INTERVAL, NODE_CACHE_LIMIT } from "src/config";
-import { jsonRpc, onChain } from "src/main";
+import { onChain } from "src/main";
 import { Block } from "src/types/api";
 import { ApiError } from "src/utils/ApiError";
 

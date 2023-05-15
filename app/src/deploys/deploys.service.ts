@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { CLValueParsers } from "casper-js-sdk";
-import { jsonRpc, onChain } from "src/main";
+import { onChain } from "src/main";
 import { DeployStatus, GetDeploy } from "src/types/deploy";
 import {
   determineDeploySessionData,

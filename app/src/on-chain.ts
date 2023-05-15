@@ -1,4 +1,5 @@
 import { CasperServiceByJsonRPC } from "casper-js-sdk";
+
 import { Sidecar } from "./sidecar";
 
 export class OnChain {
