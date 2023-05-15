@@ -10,16 +10,13 @@ export class OnChain {
 
   async getLatestBlock() {
     if (this.isSidecarRunning) {
-      // console.log("trying sidecar in OnChain");
-
       try {
         const {
           status,
           data: { block: latestBlock },
         } = await this.sidecar.latestBlock();
 
-        // TODO: implement some kid of helper function for re routing to jsonRpc when this fails
-        // to be used for all other methods in onChain
+        // TODO: implement helper function across all sidecar methods: #68
         if (
           status !== 200 ||
           latestBlock === undefined ||
@@ -40,8 +37,6 @@ export class OnChain {
 
     const { block: latestBlock } = await this.jsonRpc.getLatestBlockInfo();
 
-    console.log("defaulted back to jsonRPC for latest block");
-
     return latestBlock;
   }
 
@@ -52,8 +47,6 @@ export class OnChain {
           status,
           data: { block },
         } = await this.sidecar.getBlockByHeight(height);
-
-        // console.log("block in height", block);
 
         if (status !== 200 || block === undefined || block === null) {
           this.isSidecarRunning = false;
@@ -68,10 +61,7 @@ export class OnChain {
         return this.getBlockByHeight(height);
       }
     }
-
     const { block } = await this.jsonRpc.getBlockInfoByHeight(height);
-
-    console.log("defaulted back to jsonRPC for block by height");
 
     return block;
   }
@@ -83,8 +73,6 @@ export class OnChain {
           status,
           data: { block },
         } = await this.sidecar.getBlockByHash(hash);
-
-        // console.log("block in hash", block);
 
         if (status !== 200 || block === undefined || block === null) {
           this.isSidecarRunning = false;
@@ -101,8 +89,6 @@ export class OnChain {
     }
 
     const { block } = await this.jsonRpc.getBlockInfo(hash);
-
-    console.log("defaulted back to jsonRPC for block by hash");
 
     return block;
   }
@@ -121,8 +107,6 @@ export class OnChain {
           result: deploy_processed.execution_result,
         },
       ];
-
-      // console.log("block in hash", block);
 
       if (
         status !== 200 ||
@@ -144,8 +128,6 @@ export class OnChain {
 
     const { deploy, execution_results: executionResults } =
       await this.jsonRpc.getDeployInfo(hash);
-
-    console.log("defaulted back to jsonRPC for deploy by hash");
 
     return { deploy, executionResults };
   }

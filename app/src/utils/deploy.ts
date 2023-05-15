@@ -49,11 +49,6 @@ export const determineDeploySessionData: (
   let action = "N/A";
   let deployType: string | undefined;
 
-  console.log(
-    "deploy session args",
-    (deploySession as JsonDeployWasmSession).ModuleBytes.args
-  );
-
   if (isWasmDeploy(deploySession)) {
     action = "WASM deploy";
     sessionMap = new Map(
@@ -90,25 +85,14 @@ export const determineDeploySessionData: (
     return { action };
   }
 
-  // payment args [
-  //   [
-  //     'amount',
-  //     { cl_type: 'U512', bytes: '0500d0ed902e', parsed: '200000000000' }
-  //   ]
-  // ]
-
-  // console.log({ deployType });
-  // console.log({ action });
-  // console.log({ sessionMap });
-
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const amount = sessionMap.get("amount")
     ? (CLValueParsers.fromJSON(sessionMap.get("amount"))
         .unwrap()
         .value()
         .toString() as string)
-    : "0";
+    : // TODO: will update and potentially remove "amount" in #67
+      "0";
 
-  // TODO: figure out what the heck is going on with amount
   return { action, deployType, amount };
 };

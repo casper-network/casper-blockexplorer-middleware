@@ -12,12 +12,10 @@ export class DeploysService {
   async getDeploy(hash: string): Promise<GetDeploy> {
     console.log("deploy hash", hash);
 
-    const { deploy, execution_results: executionResults } =
-      await jsonRpc.getDeployInfo(hash);
+    // const { deploy, execution_results: executionResults } =
+    // await jsonRpc.getDeployInfo(hash);
 
-    // const { deploy, executionResults } = await onChain.getDeploy(hash);
-
-    console.log({ deploy, executionResults });
+    const { deploy, executionResults } = await onChain.getDeploy(hash);
 
     // @ts-ignore
     const paymentMap = new Map(deploy.payment.ModuleBytes?.args);
@@ -27,9 +25,6 @@ export class DeploysService {
       .unwrap()
       .value()
       .toString() as string;
-
-    console.log("payment args", deploy.payment.ModuleBytes?.args);
-    console.log({ paymentAmount });
 
     const { timestamp, account: publicKey } = deploy.header;
 
