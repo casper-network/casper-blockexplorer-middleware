@@ -33,8 +33,6 @@ export class AppService {
   }
 
   async getStatus(overrideCache?: boolean) {
-    console.log("side car set to isSidecarRunning", onChain.isSidecarRunning);
-
     const cachedStatus = await this.cacheManager.get<GetStatusResult>("status");
 
     if (cachedStatus && !overrideCache) {
