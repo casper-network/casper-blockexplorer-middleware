@@ -3,6 +3,7 @@ import { NestFactory } from "@nestjs/core";
 import { CasperServiceByJsonRPC } from "casper-js-sdk";
 
 import { AppModule } from "./app.module";
+import { SIDECAR_REST_URL } from "./config";
 import { nodeManager } from "./node-manager";
 import { OnChain } from "./on-chain";
 import { Sidecar } from "./sidecar";
@@ -17,11 +18,9 @@ async function bootstrap() {
 bootstrap();
 
 export const jsonRpc = new CasperServiceByJsonRPC(
-  "http://3.136.227.9:7777/rpc"
+  nodeManager.getActiveNode().url
 );
 
-// TODO: replace 3.136.227.9 with nodeManager.getActiveNode().url
-// and then append 18888 to be used here as the sidecar port
-export const sidecar = new Sidecar("http://3.136.227.9:18888");
+export const sidecar = new Sidecar(SIDECAR_REST_URL);
 
 export const onChain = new OnChain(jsonRpc, sidecar);

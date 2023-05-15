@@ -95,35 +95,35 @@ export class OnChain {
 
   async getDeploy(hash: string) {
     if (this.isSidecarRunning) {
-      // try {
-      const {
-        status,
-        data: { deploy_accepted, deploy_processed },
-      } = await this.sidecar.getDeploy(hash);
+      try {
+        const {
+          status,
+          data: { deploy_accepted, deploy_processed },
+        } = await this.sidecar.getDeploy(hash);
 
-      const executionResults = [
-        {
-          block_hash: deploy_processed.block_hash,
-          result: deploy_processed.execution_result,
-        },
-      ];
+        const executionResults = [
+          {
+            block_hash: deploy_processed.block_hash,
+            result: deploy_processed.execution_result,
+          },
+        ];
 
-      if (
-        status !== 200 ||
-        deploy_accepted === undefined ||
-        deploy_accepted === null
-      ) {
+        if (
+          status !== 200 ||
+          deploy_accepted === undefined ||
+          deploy_accepted === null
+        ) {
+          this.isSidecarRunning = false;
+          return this.getDeploy(hash);
+        }
+
+        return { deploy: deploy_accepted, executionResults };
+      } catch (e) {
+        console.log("Error requesting deploy by hash from sidecar.");
+
         this.isSidecarRunning = false;
         return this.getDeploy(hash);
       }
-
-      return { deploy: deploy_accepted, executionResults };
-      // } catch (e) {
-      //   console.log("Error requesting deploy by hash from sidecar.");
-
-      //   this.isSidecarRunning = false;
-      //   return this.getDeploy(hash);
-      // }
     }
 
     const { deploy, execution_results: executionResults } =

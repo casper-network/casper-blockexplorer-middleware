@@ -10,11 +10,6 @@ import {
 @Injectable()
 export class DeploysService {
   async getDeploy(hash: string): Promise<GetDeploy> {
-    console.log("deploy hash", hash);
-
-    // const { deploy, execution_results: executionResults } =
-    // await jsonRpc.getDeployInfo(hash);
-
     const { deploy, executionResults } = await onChain.getDeploy(hash);
 
     // @ts-ignore
