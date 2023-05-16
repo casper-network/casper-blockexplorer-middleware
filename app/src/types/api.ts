@@ -67,3 +67,32 @@ export type Sort = "desc" | "asc";
 export interface ActualBid extends Bid {
   inactive: boolean;
 }
+
+export interface SidecarDeploy {
+  deploy_hash: string;
+  deploy_accepted: {
+    hash: string;
+    header: {
+      account: string;
+      timestamp: string;
+      ttl: string;
+      gas_price: number;
+      body_hash: string;
+      dependencies: [];
+      chain_name: string;
+    };
+    payment: { ModuleBytes: [] };
+    session: { ModuleBytes: [] };
+    approvals: [];
+  };
+  deploy_processed: {
+    deploy_hash: string;
+    account: string;
+    timestamp: string;
+    ttl: string;
+    dependencies: [];
+    block_hash: string;
+    execution_result: { Failure: object };
+  };
+  deploy_expired: boolean;
+}
