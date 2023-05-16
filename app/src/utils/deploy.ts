@@ -1,5 +1,4 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-import { CLValueParsers } from "casper-js-sdk";
 import {
   DeployStatus,
   JsonDeployEntryPointSession,
@@ -85,14 +84,5 @@ export const determineDeploySessionData: (
     return { action };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const amount = sessionMap.get("amount")
-    ? (CLValueParsers.fromJSON(sessionMap.get("amount"))
-        .unwrap()
-        .value()
-        .toString() as string)
-    : // TODO: will update and potentially remove "amount" in #67
-      "0";
-
-  return { action, deployType, amount };
+  return { action, deployType };
 };

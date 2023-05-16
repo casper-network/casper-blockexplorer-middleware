@@ -32,7 +32,7 @@ export class DeploysService {
 
     const deploySession = deploy.session as unknown as JsonDeploySession;
 
-    const { action, deployType, amount } = determineDeploySessionData(
+    const { action, deployType } = determineDeploySessionData(
       deploySession,
       status
     );
@@ -51,7 +51,6 @@ export class DeploysService {
       publicKey,
       action,
       deployType,
-      amount,
       paymentAmount,
       cost: cost.toString(),
       status,
