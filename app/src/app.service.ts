@@ -4,19 +4,30 @@ import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { GetStatusResult } from "casper-js-sdk";
 
-import { jsonRpc } from "./main";
 import { version } from "../package.json";
+import { jsonRpc, onChain, sidecar } from "./main";
 
 @Injectable()
 export class AppService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
   async onModuleInit() {
+    const isSidecarRunning = await sidecar.getIsSidecarRunning();
+
+    onChain.isSidecarRunning = isSidecarRunning;
+
     await this.getStatus();
   }
 
+  @Cron("*/10 * * * *")
+  async handleSidecarCron() {
+    const isSidecarRunning = await sidecar.getIsSidecarRunning();
+
+    onChain.isSidecarRunning = isSidecarRunning;
+  }
+
   @Cron("*/30 * * * *")
-  async handleCron() {
+  async handleStatusCron() {
     const overrideCache = true;
     await this.getStatus(overrideCache);
   }

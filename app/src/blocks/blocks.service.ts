@@ -3,7 +3,7 @@ import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { StatusCodes } from "http-status-codes";
 import { BLOCK_GENERATE_INTERVAL, NODE_CACHE_LIMIT } from "src/config";
-import { jsonRpc } from "src/main";
+import { onChain } from "src/main";
 import { Block } from "src/types/api";
 import { ApiError } from "src/utils/ApiError";
 
@@ -28,7 +28,7 @@ export class BlocksService {
       return cachedLatestBlock;
     }
 
-    const { block } = await jsonRpc.getLatestBlockInfo();
+    const block = await onChain.getLatestBlock();
 
     if (!block) {
       throw new ApiError(StatusCodes.NOT_FOUND, "Latest block not found.");
@@ -47,7 +47,7 @@ export class BlocksService {
 
     if (cachedBlock) return cachedBlock;
 
-    const { block } = await jsonRpc.getBlockInfoByHeight(height);
+    const block = await onChain.getBlockByHeight(height);
 
     if (!block)
       throw new ApiError(StatusCodes.NOT_FOUND, "Block by height not found.");
@@ -59,7 +59,7 @@ export class BlocksService {
   }
 
   async getBlock(blockHash: string) {
-    const { block } = await jsonRpc.getBlockInfo(blockHash);
+    const block = await onChain.getBlockByHash(blockHash);
 
     if (!block)
       throw new ApiError(StatusCodes.NOT_FOUND, "Block by hash not found.");

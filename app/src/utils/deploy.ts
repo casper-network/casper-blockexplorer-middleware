@@ -86,10 +86,13 @@ export const determineDeploySessionData: (
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const amount = CLValueParsers.fromJSON(sessionMap.get("amount"))
-    .unwrap()
-    .value()
-    .toString() as string;
+  const amount = sessionMap.get("amount")
+    ? (CLValueParsers.fromJSON(sessionMap.get("amount"))
+        .unwrap()
+        .value()
+        .toString() as string)
+    : // TODO: will update and potentially remove "amount" in #67
+      "0";
 
   return { action, deployType, amount };
 };
