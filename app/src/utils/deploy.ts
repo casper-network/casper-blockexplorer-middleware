@@ -42,35 +42,23 @@ export const determineDeploySessionData: (
 ) => {
   action: string;
   deployType?: string;
-  amount?: string;
 } = (deploySession, deployStatus) => {
-  let sessionMap: Map<unknown, unknown>;
   let action = "N/A";
   let deployType: string | undefined;
 
   if (isWasmDeploy(deploySession)) {
     action = "WASM deploy";
-    sessionMap = new Map(
-      (deploySession as JsonDeployWasmSession).ModuleBytes.args
-    );
   } else if (isTransferDeploy(deploySession)) {
     action = "Transfer";
-    sessionMap = new Map(
-      (deploySession as JsonDeployTransferSession).Transfer.args
-    );
   } else if (isEntryPointDeploy(deploySession)) {
     const typedDeploySession = deploySession as JsonDeployEntryPointSession;
 
     if (typedDeploySession.StoredContractByHash) {
       deployType = "StoredContractByHash";
       action = typedDeploySession.StoredContractByHash.entry_point;
-      sessionMap = new Map(typedDeploySession.StoredContractByHash.args);
     } else if (typedDeploySession.StoredVersionedContractByName) {
       deployType = "StoredVersionContractByName";
       action = typedDeploySession.StoredVersionedContractByName.entry_point;
-      sessionMap = new Map(
-        typedDeploySession.StoredVersionedContractByName.args
-      );
     } else {
       return { action };
     }
