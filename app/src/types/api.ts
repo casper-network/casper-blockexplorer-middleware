@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import { Bid, ValidatorBid, ValidatorWeight } from "casper-js-sdk";
 
 export interface Peer {
@@ -66,4 +67,33 @@ export interface Header {
 export type Sort = "desc" | "asc";
 export interface ActualBid extends Bid {
   inactive: boolean;
+}
+
+export interface SidecarDeploy {
+  deploy_hash: string;
+  deploy_accepted: {
+    hash: string;
+    header: {
+      account: string;
+      timestamp: string;
+      ttl: string;
+      gas_price: number;
+      body_hash: string;
+      dependencies: any[];
+      chain_name: string;
+    };
+    payment: { ModuleBytes: any[] };
+    session: { ModuleBytes: any[] };
+    approvals: any[];
+  };
+  deploy_processed: {
+    deploy_hash: string;
+    account: string;
+    timestamp: string;
+    ttl: string;
+    dependencies: any[];
+    block_hash: string;
+    execution_result: { Failure: object };
+  };
+  deploy_expired: boolean;
 }

@@ -36,7 +36,6 @@ export interface GetDeploy {
   publicKey: string;
   action: string;
   deployType: string | undefined;
-  amount: string | undefined;
   paymentAmount: string;
   cost: string;
   status: DeployStatus;

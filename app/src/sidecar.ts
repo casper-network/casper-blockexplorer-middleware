@@ -1,6 +1,8 @@
 import axios, { AxiosInstance } from "axios";
 import { GetBlockResult } from "casper-js-sdk";
 
+import { SidecarDeploy } from "./types/api";
+
 export class Sidecar {
   private api: AxiosInstance;
 
@@ -43,8 +45,7 @@ export class Sidecar {
   }
 
   async getDeploy(hash: string) {
-    // TODO: need to type this return (#67)
-    const result = await this.api.get(`/deploy/${hash}`);
+    const result = await this.api.get<SidecarDeploy>(`/deploy/${hash}`);
 
     return result;
   }
