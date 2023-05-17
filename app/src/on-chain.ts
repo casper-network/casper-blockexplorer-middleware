@@ -9,7 +9,7 @@ export class OnChain {
     public isSidecarRunning: boolean = false
   ) {}
 
-  async checkSidecarStatus<TEntity extends {} = {}>(
+  async checkSidecarStatus<TEntity extends object>(
     status: number,
     entity: TEntity | undefined | null,
     onChainMethod: () => void
