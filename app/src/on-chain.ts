@@ -1,4 +1,4 @@
-import { CasperServiceByJsonRPC } from "casper-js-sdk";
+import { CasperServiceByJsonRPC, JsonBlock } from "casper-js-sdk";
 
 import { Sidecar } from "./sidecar";
 
@@ -9,6 +9,17 @@ export class OnChain {
     public isSidecarRunning: boolean = false
   ) {}
 
+  async checkSidecarStatus<TEntity extends {} = {}>(
+    status: number,
+    entity: TEntity | undefined | null,
+    onChainMethod: () => void
+  ) {
+    if (status !== 200 || entity === undefined || entity === null) {
+      this.isSidecarRunning = false;
+      return onChainMethod();
+    }
+  }
+
   async getLatestBlock() {
     if (this.isSidecarRunning) {
       try {
@@ -17,22 +28,16 @@ export class OnChain {
           data: { block: latestBlock },
         } = await this.sidecar.latestBlock();
 
-        // TODO: implement helper function across all sidecar methods: #68
-        if (
-          status !== 200 ||
-          latestBlock === undefined ||
-          latestBlock === null
-        ) {
-          this.isSidecarRunning = false;
-          return this.getLatestBlock();
-        }
+        this.checkSidecarStatus<JsonBlock>(status, latestBlock, () =>
+          this.getLatestBlock()
+        );
 
         return latestBlock;
       } catch (e) {
         console.log("Error requesting latest block from sidecar.", e);
 
         this.isSidecarRunning = false;
-        this.getLatestBlock();
+        return this.getLatestBlock();
       }
     }
 
@@ -49,10 +54,9 @@ export class OnChain {
           data: { block },
         } = await this.sidecar.getBlockByHeight(height);
 
-        if (status !== 200 || block === undefined || block === null) {
-          this.isSidecarRunning = false;
-          return this.getBlockByHeight(height);
-        }
+        this.checkSidecarStatus<JsonBlock>(status, block, () =>
+          this.getBlockByHeight(height)
+        );
 
         return block;
       } catch (e) {
@@ -75,10 +79,9 @@ export class OnChain {
           data: { block },
         } = await this.sidecar.getBlockByHash(hash);
 
-        if (status !== 200 || block === undefined || block === null) {
-          this.isSidecarRunning = false;
-          return this.getBlockByHash(hash);
-        }
+        this.checkSidecarStatus<JsonBlock>(status, block, () =>
+          this.getBlockByHash(hash)
+        );
 
         return block;
       } catch (e) {
@@ -109,14 +112,9 @@ export class OnChain {
           },
         ];
 
-        if (
-          status !== 200 ||
-          deploy_accepted === undefined ||
-          deploy_accepted === null
-        ) {
-          this.isSidecarRunning = false;
-          return this.getDeploy(hash);
-        }
+        this.checkSidecarStatus(status, deploy_accepted, () =>
+          this.getDeploy(hash)
+        );
 
         return { deploy: deploy_accepted, executionResults };
       } catch (e) {
