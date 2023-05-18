@@ -31,6 +31,8 @@ export class MyGateway
 
     console.log("WS client with id: ", client.id);
     console.log("Number of connected sockets: ", sockets.size);
+
+    this.io.to(client.id).emit("test_message", "this is a test message");
   }
 
   handleDisconnect(client: Socket) {
