@@ -3,22 +3,38 @@ import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { StatusCodes } from "http-status-codes";
 import { BLOCK_GENERATE_INTERVAL, NODE_CACHE_LIMIT } from "src/config";
+import { GatewayService } from "src/gateway/gateway.service";
 import { onChain } from "src/main";
 import { Block } from "src/types/api";
 import { ApiError } from "src/utils/ApiError";
 
 @Injectable()
 export class BlocksService {
-  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(GatewayService) private readonly gateway: GatewayService
+  ) {}
 
   async onModuleInit() {
     await this.getLatestBlock();
   }
 
-  @Cron(`*/${BLOCK_GENERATE_INTERVAL / 2} * * * * *`)
+  @Cron(`*/${BLOCK_GENERATE_INTERVAL / 2} * * * * *`, {
+    name: "latestBlockSchedule",
+  })
   async handleCron() {
     const overrideCache = true;
     await this.getLatestBlock(overrideCache);
+  }
+
+  // TODO: just testing for now. Will update in #74
+  @Cron(`*/10 * * * * *`, { name: "gatewaySchedule" })
+  async handleGatewayCron() {
+    console.log("gateway cron has run...", new Date().getTime());
+
+    this.gateway.handleEvent("gateway_schedule", {
+      test: "gateway schedule test",
+    });
   }
 
   public async getLatestBlock(overrideCache?: boolean) {
