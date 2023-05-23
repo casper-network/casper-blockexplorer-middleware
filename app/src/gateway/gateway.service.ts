@@ -13,7 +13,7 @@ import { Namespace, Socket } from "socket.io";
     origin: "*",
   },
 })
-export class MyGateway
+export class GatewayService
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()

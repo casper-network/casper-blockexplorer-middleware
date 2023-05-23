@@ -3,7 +3,7 @@ import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { StatusCodes } from "http-status-codes";
 import { BLOCK_GENERATE_INTERVAL, NODE_CACHE_LIMIT } from "src/config";
-import { MyGateway } from "src/gateway/gateway";
+import { GatewayService } from "src/gateway/gateway.service";
 import { onChain } from "src/main";
 import { Block } from "src/types/api";
 import { ApiError } from "src/utils/ApiError";
@@ -18,7 +18,7 @@ export class BlocksService {
   // for fetching latest block when ready and adding to cache
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
-    @Inject(MyGateway) private readonly gateway: MyGateway
+    @Inject(GatewayService) private readonly gateway: GatewayService
   ) {}
 
   async onModuleInit() {
