@@ -10,12 +10,6 @@ import { ApiError } from "src/utils/ApiError";
 
 @Injectable()
 export class BlocksService {
-  // TODO: probably want to inject getway service here like we have
-  // blocksSerivce in validatorsService (use same pattern)
-  // and then we'll have access to `io` variable for emitting new blocks on the timer
-
-  // TODO: figure out best way to add timer here (copy FE)
-  // for fetching latest block when ready and adding to cache
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     @Inject(GatewayService) private readonly gateway: GatewayService
@@ -33,6 +27,7 @@ export class BlocksService {
     await this.getLatestBlock(overrideCache);
   }
 
+  // TODO: just testing for now. Will update in #74
   @Cron(`*/10 * * * * *`, { name: "gatewaySchedule" })
   async handleGatewayCron() {
     console.log("gateway cron has run...", new Date().getTime());
