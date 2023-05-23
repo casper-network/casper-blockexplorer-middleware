@@ -37,10 +37,6 @@ export class BlocksService {
     });
   }
 
-  public async emitFromBlocksService(data) {
-    console.log("emitting from blocks service", data);
-  }
-
   public async getLatestBlock(overrideCache?: boolean) {
     const cachedLatestBlock = await this.cacheManager.get<Block>("latest");
 
