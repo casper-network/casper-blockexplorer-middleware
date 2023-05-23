@@ -1,9 +1,9 @@
 import {
-  WebSocketGateway,
-  WebSocketServer,
-  OnGatewayInit,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
+  WebSocketGateway,
+  WebSocketServer,
 } from "@nestjs/websockets";
 import { Namespace, Socket } from "socket.io";
 
@@ -30,7 +30,7 @@ export class GatewayService
     console.log("Number of connected sockets: ", sockets.size);
   }
 
-  handleEvent(event: string, ...args: any[]) {
+  handleEvent(event: string, ...args) {
     this.io.emit(event, JSON.stringify(args));
   }
 

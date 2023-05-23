@@ -37,7 +37,7 @@ export class BlocksService {
     });
   }
 
-  public async emitFromBlocksService(data: any) {
+  public async emitFromBlocksService(data) {
     console.log("emitting from blocks service", data);
   }
 
