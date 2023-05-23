@@ -3,22 +3,47 @@ import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { StatusCodes } from "http-status-codes";
 import { BLOCK_GENERATE_INTERVAL, NODE_CACHE_LIMIT } from "src/config";
+import { MyGateway } from "src/gateway/gateway";
 import { onChain } from "src/main";
 import { Block } from "src/types/api";
 import { ApiError } from "src/utils/ApiError";
 
 @Injectable()
 export class BlocksService {
-  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
+  // TODO: probably want to inject getway service here like we have
+  // blocksSerivce in validatorsService (use same pattern)
+  // and then we'll have access to `io` variable for emitting new blocks on the timer
+
+  // TODO: figure out best way to add timer here (copy FE)
+  // for fetching latest block when ready and adding to cache
+  constructor(
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(MyGateway) private readonly gateway: MyGateway
+  ) {}
 
   async onModuleInit() {
     await this.getLatestBlock();
   }
 
-  @Cron(`*/${BLOCK_GENERATE_INTERVAL / 2} * * * * *`)
+  @Cron(`*/${BLOCK_GENERATE_INTERVAL / 2} * * * * *`, {
+    name: "latestBlockSchedule",
+  })
   async handleCron() {
     const overrideCache = true;
     await this.getLatestBlock(overrideCache);
+  }
+
+  @Cron(`*/10 * * * * *`, { name: "gatewaySchedule" })
+  async handleGatewayCron() {
+    console.log("gateway cron has run...", new Date().getTime());
+
+    this.gateway.handleEvent("gateway_schedule", {
+      test: "gateway schedule test",
+    });
+  }
+
+  public async emitFromBlocksService(data: any) {
+    console.log("emitting from blocks service", data);
   }
 
   public async getLatestBlock(overrideCache?: boolean) {

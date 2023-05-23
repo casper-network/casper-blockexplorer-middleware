@@ -1,12 +1,9 @@
-import { OnModuleInit } from "@nestjs/common";
 import {
   WebSocketGateway,
   WebSocketServer,
   OnGatewayInit,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  SubscribeMessage,
-  MessageBody,
 } from "@nestjs/websockets";
 import { Namespace, Socket } from "socket.io";
 
@@ -32,7 +29,24 @@ export class MyGateway
     console.log("WS client with id: ", client.id);
     console.log("Number of connected sockets: ", sockets.size);
 
-    this.io.to(client.id).emit("test_message", "this is a test message");
+    // this.io.to(client.id).emit(
+    //   "test_message",
+    //   JSON.stringify({
+    //     first: "this is the first property",
+    //     second: false,
+    //     third: 1000,
+    //   })
+    // );
+  }
+
+  handleEvent(event: string, ...args: any[]) {
+    // TODO: figure out how to pass the clientID here like in handleConnection method
+    // Or actually do we really care since we'll want to emit to all clients connected?
+    // I should really figure out a way to test that we can emit to multiple clients at once
+    console.log({ event });
+    console.log({ args });
+
+    this.io.emit(event, JSON.stringify(args));
   }
 
   handleDisconnect(client: Socket) {
