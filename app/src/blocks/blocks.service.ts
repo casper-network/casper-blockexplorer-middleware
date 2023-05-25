@@ -24,7 +24,11 @@ export class BlocksService {
   })
   async handleCron() {
     const overrideCache = true;
-    await this.getLatestBlock(overrideCache);
+    const latestBlock = await this.getLatestBlock(overrideCache);
+
+    this.gateway.handleEvent("latest_block", {
+      latestBlock,
+    });
   }
 
   // TODO: just testing for now. Will update in #74
