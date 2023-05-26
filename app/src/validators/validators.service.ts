@@ -4,6 +4,7 @@ import { Cache } from "cache-manager";
 import { ValidatorsInfoResult } from "casper-js-sdk";
 import { BlocksService } from "src/blocks/blocks.service";
 import { ERA_CHECK_PERIOD_MINUTES } from "src/config";
+import { GatewayService } from "src/gateway/gateway.service";
 import { jsonRpc } from "src/main";
 import {
   ActualBid,
@@ -16,7 +17,8 @@ import {
 export class ValidatorsService {
   constructor(
     @Inject(BlocksService) private readonly blocksService: BlocksService,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(GatewayService) private readonly gateway: GatewayService
   ) {}
 
   async onModuleInit() {
@@ -37,6 +39,12 @@ export class ValidatorsService {
     if (latestEraId !== cachedValidatorsInfo?.status.latestEraId) {
       await this.getCurrentEraValidators();
     }
+
+    const currentEraValidatorStatus = await this.getCurrentEraValidatorStatus();
+
+    this.gateway.handleEvent("current_era_validator_status", {
+      currentEraValidatorStatus,
+    });
   }
 
   async getCurrentEraValidators(
