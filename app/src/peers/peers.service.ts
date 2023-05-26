@@ -1,12 +1,16 @@
 import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
+import { GatewayService } from "src/gateway/gateway.service";
 import { jsonRpc } from "src/main";
 import { Peer } from "src/types/api";
 
 @Injectable()
 export class PeersService {
-  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(GatewayService) private readonly gateway: GatewayService
+  ) {}
 
   isFetchingPeers = false;
 
@@ -17,6 +21,12 @@ export class PeersService {
   @Cron("*/2 * * * *")
   async handleCron() {
     await this.fetchPeersRpc();
+
+    const peers = await this.getPeers();
+
+    this.gateway.handleEvent("peers", {
+      peers,
+    });
   }
 
   async fetchPeersRpc() {
