@@ -30,7 +30,6 @@ export class PeersService {
   }
 
   async fetchPeersRpc() {
-    // TODO: temporary - currently determining better fix
     if (this.isFetchingPeers) {
       return;
     }
