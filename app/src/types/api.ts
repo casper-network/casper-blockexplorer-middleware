@@ -25,7 +25,8 @@ export interface ValidatorProcessed {
 }
 
 export interface ValidatorsProcessedWithStatus {
-  validators: ValidatorProcessed[];
+  currentEraValidators: ValidatorProcessed[];
+  nextEraValidators: ValidatorProcessed[];
   status: {
     validatorsCount: number;
     bidsCount: number;
