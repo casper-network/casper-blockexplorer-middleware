@@ -31,16 +31,6 @@ export class BlocksService {
     });
   }
 
-  // TODO: just testing for now. Will update in #74
-  @Cron(`*/10 * * * * *`, { name: "gatewaySchedule" })
-  async handleGatewayCron() {
-    console.log("gateway cron has run...", new Date().getTime());
-
-    this.gateway.handleEvent("gateway_schedule", {
-      test: "gateway schedule test",
-    });
-  }
-
   public async getLatestBlock(overrideCache?: boolean) {
     const cachedLatestBlock = await this.cacheManager.get<Block>("latest");
 
@@ -126,7 +116,7 @@ export class BlocksService {
         }
         blockPromises.push(block);
       } catch (error) {
-        console.log("ERROR", error);
+        console.log("Error using this.getBlockByHeight", error);
         break;
       }
     }
