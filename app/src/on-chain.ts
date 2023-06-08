@@ -150,6 +150,6 @@ export class OnChain {
       }
     }
 
-    return "Sidecar was not able to fetch deploys data.";
+    return [];
   }
 }
