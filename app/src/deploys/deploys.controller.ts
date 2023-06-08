@@ -22,4 +22,11 @@ export class DeploysController {
 
     return deploy;
   }
+
+  @Get()
+  async getDeploys() {
+    const deploys = await this.deploysService.getDeploys();
+
+    return deploys;
+  }
 }

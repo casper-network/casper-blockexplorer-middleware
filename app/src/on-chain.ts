@@ -118,7 +118,7 @@ export class OnChain {
 
         return { deploy: deploy_accepted, executionResults };
       } catch (e) {
-        console.log("Error requesting deploy by hash from sidecar.");
+        console.log("Error requesting deploy by hash from sidecar.", e);
 
         this.isSidecarRunning = false;
         return this.getDeploy(hash);
@@ -129,5 +129,28 @@ export class OnChain {
       await this.jsonRpc.getDeployInfo(hash);
 
     return { deploy, executionResults };
+  }
+
+  async getDeploys() {
+    if (this.isSidecarRunning) {
+      try {
+        const {
+          status,
+          data: { data },
+        } = await this.sidecar.getDeploys();
+
+        this.checkSidecarStatus(status, data, () => this.getDeploys());
+
+        return data;
+      } catch (e) {
+        console.log("Error requesting deploys from sidecar.", e);
+
+        this.isSidecarRunning = false;
+        return this.getDeploys();
+      }
+    }
+
+    // TODO: come up with better solution
+    return "sidecar not returning deploy...";
   }
 }

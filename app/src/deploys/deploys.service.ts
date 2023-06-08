@@ -60,4 +60,10 @@ export class DeploysService {
       }),
     };
   }
+
+  async getDeploys() {
+    const deploys = await onChain.getDeploys();
+
+    return deploys;
+  }
 }
