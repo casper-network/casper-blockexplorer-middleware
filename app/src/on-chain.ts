@@ -150,7 +150,6 @@ export class OnChain {
       }
     }
 
-    // TODO: come up with better solution
-    return "sidecar not returning deploy...";
+    return "Sidecar was not able to fetch deploys data.";
   }
 }
