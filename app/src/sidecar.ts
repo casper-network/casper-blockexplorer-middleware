@@ -63,8 +63,6 @@ export class Sidecar {
       limit: 100,
     });
 
-    console.log({ result });
-
     return result;
   }
 }
