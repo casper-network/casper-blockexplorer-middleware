@@ -8,6 +8,7 @@ export class Sidecar {
 
   constructor(
     public url: string,
+    // TODO: will use sidecar endpoint when ready
     private readonly tempDevNet: AxiosInstance = axios.create({
       baseURL: "http://jakub.devnet.casperlabs.io:8888",
     })
