@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, AxiosStatic } from "axios";
 import { GetBlockResult } from "casper-js-sdk";
 
 import { SidecarDeploy } from "./types/api";
@@ -6,7 +6,13 @@ import { SidecarDeploy } from "./types/api";
 export class Sidecar {
   private api: AxiosInstance;
 
-  constructor(public url: string) {
+  constructor(
+    public url: string,
+    // TODO: will use sidecar endpoint when ready
+    private readonly tempDevNet: AxiosInstance = axios.create({
+      baseURL: "http://jakub.devnet.casperlabs.io:8888",
+    })
+  ) {
     this.api = axios.create({ baseURL: url });
   }
 
@@ -46,6 +52,17 @@ export class Sidecar {
 
   async getDeploy(hash: string) {
     const result = await this.api.get<SidecarDeploy>(`/deploy/${hash}`);
+
+    return result;
+  }
+
+  async getDeploys() {
+    const result = await this.tempDevNet.post("deploys", {
+      exclude_expired: true,
+      exclude_not_processed: false,
+      offset: 0,
+      limit: 100,
+    });
 
     return result;
   }
