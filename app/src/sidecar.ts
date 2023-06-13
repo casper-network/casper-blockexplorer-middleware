@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosStatic } from "axios";
+import axios, { AxiosInstance } from "axios";
 import { GetBlockResult } from "casper-js-sdk";
 
 import { SidecarDeploy } from "./types/api";
