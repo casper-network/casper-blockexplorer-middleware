@@ -57,12 +57,15 @@ export class Sidecar {
   }
 
   async getDeploys() {
-    const result = await this.tempDevNet.post("deploys", {
-      exclude_expired: true,
-      exclude_not_processed: false,
-      offset: 0,
-      limit: 100,
-    });
+    const result = await this.tempDevNet.post<{ data: SidecarDeploy }>(
+      "deploys",
+      {
+        exclude_expired: true,
+        exclude_not_processed: false,
+        offset: 0,
+        limit: 100,
+      }
+    );
 
     return result;
   }
