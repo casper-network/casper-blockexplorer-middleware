@@ -39,7 +39,7 @@ export class DeploysService {
       const processedDeploy = await onChain.getDeploy(hash);
 
       deploy = processedDeploy.deploy;
-      executionResults = processedDeploy.execution_results;
+      executionResults = processedDeploy.executionResults;
     }
 
     // @ts-ignore
