@@ -15,10 +15,6 @@ import {
 export class DeploysService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
-  async onModuleInit() {
-    await this.getDeploys();
-  }
-
   async getDeploy(hash: string): Promise<GetDeploy> {
     const cachedDeployByHash = await this.cacheManager.get<SidecarDeploy>(hash);
 
