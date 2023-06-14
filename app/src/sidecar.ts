@@ -65,6 +65,7 @@ export class Sidecar {
         exclude_not_processed: false,
         offset: pageNum - 1,
         limit: count,
+        // TODO: sorting will be implemented in #92
         sort_column: "block_timestamp",
         sort_order: "desc",
       }

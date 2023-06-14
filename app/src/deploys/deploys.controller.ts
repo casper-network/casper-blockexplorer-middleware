@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
-import { IsNumber, IsOptional, IsString } from "class-validator";
 import { Transform } from "class-transformer";
+import { IsNumber, IsOptional, IsString } from "class-validator";
 import { IsValidHash, ValidationError } from "src/utils/nest-validation";
 
 import { DeploysService } from "./deploys.service";
