@@ -1,10 +1,10 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { Transform } from "class-transformer";
 import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
+import { Sort } from "src/types/api";
 import { IsValidHash, ValidationError } from "src/utils/nest-validation";
 
 import { DeploysService } from "./deploys.service";
-import { Sort } from "src/types/api";
 
 export class DeploysQueryDtp {
   @Transform(({ value }) => parseInt(value, 10))
