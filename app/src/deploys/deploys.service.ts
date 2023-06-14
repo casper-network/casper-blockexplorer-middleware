@@ -1,7 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
+import { Cache } from "cache-manager";
 import { CLValueParsers } from "casper-js-sdk";
+import { StatusCodes } from "http-status-codes";
 import { onChain } from "src/main";
+import { SidecarDeploy } from "src/types/api";
 import { DeployStatus, GetDeploy } from "src/types/deploy";
+import { ApiError } from "src/utils/ApiError";
 import {
   determineDeploySessionData,
   JsonDeploySession,
@@ -9,8 +13,34 @@ import {
 
 @Injectable()
 export class DeploysService {
+  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
+
   async getDeploy(hash: string): Promise<GetDeploy> {
-    const { deploy, executionResults } = await onChain.getDeploy(hash);
+    const cachedDeployByHash = await this.cacheManager.get<SidecarDeploy>(hash);
+
+    let deploy: SidecarDeploy["deploy_accepted"];
+    let executionResults: {
+      block_hash: string;
+      // TODO: properly type this as part of ticket #94
+      /* eslint-disable  @typescript-eslint/no-explicit-any */
+      result: any;
+    }[];
+    if (cachedDeployByHash) {
+      executionResults = [
+        {
+          block_hash: cachedDeployByHash.deploy_processed.block_hash,
+          result: cachedDeployByHash.deploy_processed.execution_result,
+        },
+      ];
+
+      deploy = cachedDeployByHash.deploy_accepted;
+    } else {
+      // TODO: properly type this as part of ticket #94
+      const processedDeploy = await onChain.getDeploy(hash);
+
+      deploy = processedDeploy.deploy;
+      executionResults = processedDeploy.executionResults;
+    }
 
     // @ts-ignore
     const paymentMap = new Map(deploy.payment.ModuleBytes?.args);
@@ -63,6 +93,18 @@ export class DeploysService {
 
   async getDeploys() {
     const deploys = await onChain.getDeploys();
+
+    if (!deploys?.length) {
+      throw new ApiError(StatusCodes.NOT_FOUND, "Deploys not found.");
+    }
+
+    for (const deploy of deploys) {
+      const cachedDeploy = await this.cacheManager.get(deploy.deploy_hash);
+
+      if (!cachedDeploy) {
+        await this.cacheManager.set(deploy.deploy_hash, deploy);
+      }
+    }
 
     return deploys;
   }
