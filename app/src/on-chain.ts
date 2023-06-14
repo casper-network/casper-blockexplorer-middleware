@@ -131,13 +131,13 @@ export class OnChain {
     return { deploy, executionResults };
   }
 
-  async getDeploys(count = 10, pageNum = 1) {
+  async getDeploys(count = 10, pageNum = 1, sortBy?: string, orderBy = "desc") {
     if (this.isSidecarRunning) {
       try {
         const {
           status,
           data: { data },
-        } = await this.sidecar.getDeploys(count, pageNum);
+        } = await this.sidecar.getDeploys(count, pageNum, sortBy, orderBy);
 
         this.checkSidecarStatus(status, data, () => this.getDeploys());
 
