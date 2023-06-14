@@ -91,8 +91,8 @@ export class DeploysService {
     };
   }
 
-  async getDeploys() {
-    const deploys = await onChain.getDeploys();
+  async getDeploys(count = 10, pageNum = 1) {
+    const deploys = await onChain.getDeploys(count, pageNum);
 
     if (!deploys?.length) {
       throw new ApiError(StatusCodes.NOT_FOUND, "Deploys not found.");

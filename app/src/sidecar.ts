@@ -56,14 +56,18 @@ export class Sidecar {
     return result;
   }
 
-  async getDeploys() {
+  async getDeploys(count = 10, pageNum = 1) {
+    // TODO: updated to released version of sidecar in #88
     const result = await this.tempDevNet.post<{ data: SidecarDeploy }>(
       "deploys",
       {
         exclude_expired: true,
         exclude_not_processed: false,
-        offset: 0,
-        limit: 100,
+        offset: pageNum - 1,
+        limit: count,
+        // TODO: sorting will be implemented in #92
+        sort_column: "block_timestamp",
+        sort_order: "desc",
       }
     );
 
