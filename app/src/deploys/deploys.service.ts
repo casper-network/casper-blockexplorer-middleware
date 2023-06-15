@@ -25,11 +25,14 @@ export class DeploysService {
     name: "latestDeploySchedule",
   })
   async handleCron() {
+    const overrideCache = true;
+
     const [latestDeploy] = await this.getDeploys(
       1,
       1,
       "block_timestamp",
-      "desc"
+      "desc",
+      overrideCache
     );
 
     const cachedDeploy = await this.cacheManager.get(latestDeploy.deploy_hash);
@@ -121,12 +124,17 @@ export class DeploysService {
     count = 10,
     pageNum = 1,
     sortBy = "block_timestamp",
-    orderBy = "desc"
+    orderBy = "desc",
+    overrideCache?: boolean
   ) {
     const deploys = await onChain.getDeploys(count, pageNum, sortBy, orderBy);
 
     if (!deploys?.length) {
       throw new ApiError(StatusCodes.NOT_FOUND, "Deploys not found.");
+    }
+
+    if (overrideCache) {
+      return deploys;
     }
 
     for (const deploy of deploys) {
