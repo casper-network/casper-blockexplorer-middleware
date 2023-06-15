@@ -1,7 +1,10 @@
 import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
+import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { CLValueParsers } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
+import { BLOCK_GENERATE_INTERVAL } from "src/config";
+import { GatewayService } from "src/gateway/gateway.service";
 import { onChain } from "src/main";
 import { SidecarDeploy } from "src/types/api";
 import { DeployStatus, GetDeploy } from "src/types/deploy";
@@ -13,7 +16,42 @@ import {
 
 @Injectable()
 export class DeploysService {
-  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(GatewayService) private readonly gateway: GatewayService
+  ) {}
+
+  @Cron(`*/${BLOCK_GENERATE_INTERVAL / 2} * * * * *`, {
+    name: "latestDeploySchedule",
+  })
+  async handleCron() {
+    // TODO: notes for fetching (new) deploys on schedule and emitting to FE:
+    // - fetch the latest deploy (i.e. page = 1, count = 1)
+    // - check to see if in cache
+    // -> if yes, do nothing
+    // -> if no, add to cache + emit to FE
+    // On FE:
+    // - check to see where it fits in within the current sorting in table
+    // + and then dynamically insert accordingly
+    // NB: check what FE does for blocks if not on page 1 (or like page 1 but asc sorting)
+
+    const [latestDeploy] = await this.getDeploys(
+      1,
+      1,
+      "block_timestamp",
+      "desc"
+    );
+
+    const cachedDeploy = await this.cacheManager.get(latestDeploy.deploy_hash);
+
+    if (!cachedDeploy) {
+      await this.cacheManager.set(latestDeploy.deploy_hash, latestDeploy);
+
+      this.gateway.handleEvent("latest_deploy", { latestDeploy });
+    }
+
+    console.log({ latestDeploy });
+  }
 
   async getDeploy(hash: string): Promise<GetDeploy> {
     const cachedDeployByHash = await this.cacheManager.get<SidecarDeploy>(hash);
@@ -97,6 +135,8 @@ export class DeploysService {
     sortBy = "block_timestamp",
     orderBy = "desc"
   ) {
+    // TODO: how can we check to see if the specific page/count of deploys are in cache??
+    // probably can't...
     const deploys = await onChain.getDeploys(count, pageNum, sortBy, orderBy);
 
     if (!deploys?.length) {
