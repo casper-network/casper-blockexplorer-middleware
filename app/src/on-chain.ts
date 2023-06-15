@@ -131,7 +131,12 @@ export class OnChain {
     return { deploy, executionResults };
   }
 
-  async getDeploys(count = 10, pageNum = 1, sortBy?: string, orderBy = "desc") {
+  async getDeploys(
+    count = 10,
+    pageNum = 1,
+    sortBy = "block_timestamp",
+    orderBy = "desc"
+  ) {
     if (this.isSidecarRunning) {
       try {
         const {
