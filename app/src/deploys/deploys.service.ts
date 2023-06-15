@@ -25,16 +25,6 @@ export class DeploysService {
     name: "latestDeploySchedule",
   })
   async handleCron() {
-    // TODO: notes for fetching (new) deploys on schedule and emitting to FE:
-    // - fetch the latest deploy (i.e. page = 1, count = 1)
-    // - check to see if in cache
-    // -> if yes, do nothing
-    // -> if no, add to cache + emit to FE
-    // On FE:
-    // - check to see where it fits in within the current sorting in table
-    // + and then dynamically insert accordingly
-    // NB: check what FE does for blocks if not on page 1 (or like page 1 but asc sorting)
-
     const [latestDeploy] = await this.getDeploys(
       1,
       1,
@@ -49,8 +39,6 @@ export class DeploysService {
 
       this.gateway.handleEvent("latest_deploy", { latestDeploy });
     }
-
-    console.log({ latestDeploy });
   }
 
   async getDeploy(hash: string): Promise<GetDeploy> {
@@ -135,8 +123,6 @@ export class DeploysService {
     sortBy = "block_timestamp",
     orderBy = "desc"
   ) {
-    // TODO: how can we check to see if the specific page/count of deploys are in cache??
-    // probably can't...
     const deploys = await onChain.getDeploys(count, pageNum, sortBy, orderBy);
 
     if (!deploys?.length) {
