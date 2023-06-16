@@ -1,7 +1,10 @@
 import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
+import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { CLValueParsers } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
+import { BLOCK_GENERATE_INTERVAL } from "src/config";
+import { GatewayService } from "src/gateway/gateway.service";
 import { onChain } from "src/main";
 import { SidecarDeploy } from "src/types/api";
 import { DeployStatus, GetDeploy } from "src/types/deploy";
@@ -13,7 +16,33 @@ import {
 
 @Injectable()
 export class DeploysService {
-  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @Inject(GatewayService) private readonly gateway: GatewayService
+  ) {}
+
+  @Cron(`*/${BLOCK_GENERATE_INTERVAL / 2} * * * * *`, {
+    name: "latestDeploySchedule",
+  })
+  async handleCron() {
+    const overrideCache = true;
+
+    const [latestDeploy] = await this.getDeploys(
+      1,
+      1,
+      "block_timestamp",
+      "desc",
+      overrideCache
+    );
+
+    const cachedDeploy = await this.cacheManager.get(latestDeploy.deploy_hash);
+
+    if (!cachedDeploy) {
+      await this.cacheManager.set(latestDeploy.deploy_hash, latestDeploy);
+
+      this.gateway.handleEvent("latest_deploy", { latestDeploy });
+    }
+  }
 
   async getDeploy(hash: string): Promise<GetDeploy> {
     const cachedDeployByHash = await this.cacheManager.get<SidecarDeploy>(hash);
@@ -95,12 +124,17 @@ export class DeploysService {
     count = 10,
     pageNum = 1,
     sortBy = "block_timestamp",
-    orderBy = "desc"
+    orderBy = "desc",
+    overrideCache?: boolean
   ) {
     const deploys = await onChain.getDeploys(count, pageNum, sortBy, orderBy);
 
     if (!deploys?.length) {
       throw new ApiError(StatusCodes.NOT_FOUND, "Deploys not found.");
+    }
+
+    if (overrideCache) {
+      return deploys;
     }
 
     for (const deploy of deploys) {
