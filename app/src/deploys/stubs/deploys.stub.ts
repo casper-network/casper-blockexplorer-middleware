@@ -38,6 +38,7 @@ export const getSidecarDeploysStub = () => [
         "92d9b84db79132a77f76216c7d81b2243fe92ef26db885ae0d64ee585e4799fa",
       execution_result: [Object],
     },
+
     deploy_expired: false,
     block_timestamp: "2023-06-15T22:14:07.104Z",
   },
