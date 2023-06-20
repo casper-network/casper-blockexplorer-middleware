@@ -100,8 +100,6 @@ export class DeploysService {
   ) {
     const deploys = await onChain.getDeploys(count, pageNum, sortBy, orderBy);
 
-    const processedDeploys = getProcessedSidecarDeploys(deploys);
-
     if (!deploys?.length) {
       throw new ApiError(StatusCodes.NOT_FOUND, "Deploys not found.");
     }
@@ -114,6 +112,8 @@ export class DeploysService {
       }
     }
 
-    return deploys;
+    const processedDeploys = getProcessedSidecarDeploys(deploys);
+
+    return processedDeploys;
   }
 }

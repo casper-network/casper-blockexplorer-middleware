@@ -90,16 +90,22 @@ export const getProcessedSidecarDeploys = (deploys: SidecarDeploy[]) => {
     const deployAcceptedSession = deploy.deploy_accepted.session;
 
     let amountMap;
+    let contractType: string;
     if (deployAcceptedSession.ModuleBytes) {
       amountMap = new Map(deployAcceptedSession.ModuleBytes?.args);
+      contractType = "WASM deploy";
     } else if (deployAcceptedSession.Transfer) {
       amountMap = new Map(deployAcceptedSession.Transfer?.args);
+      contractType = "Transfer";
     } else if (deployAcceptedSession.StoredContractByHash) {
       amountMap = new Map(deployAcceptedSession.StoredContractByHash?.args);
+      contractType = deployAcceptedSession.StoredContractByHash.entry_point;
     } else {
       amountMap = new Map(
         deployAcceptedSession.StoredVersionedContractByName?.args
       );
+      contractType =
+        deployAcceptedSession.StoredVersionedContractByName.entry_point;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -108,16 +114,16 @@ export const getProcessedSidecarDeploys = (deploys: SidecarDeploy[]) => {
       .value()
       .toString() as string;
 
-    console.log({ amountMotes });
-
     return {
-      deployHash: "",
-      blockHash: "",
-      publicKey: "",
-      timestamp: "",
-      contractType: "",
-      amountMotes: 0,
-      costMotes: 0,
+      deployHash,
+      blockHash,
+      publicKey,
+      timestamp,
+      contractType,
+      amountMotes,
+      costMotes,
     };
   });
+
+  return processedDeploys;
 };

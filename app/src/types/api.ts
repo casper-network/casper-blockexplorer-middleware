@@ -86,8 +86,8 @@ export interface SidecarDeploy {
     payment: { ModuleBytes: any[] };
     session: {
       ModuleBytes?: { args: any };
-      StoredContractByHash?: { args: any };
-      StoredVersionedContractByName?: { args: any };
+      StoredContractByHash?: { args: any; entry_point: string };
+      StoredVersionedContractByName?: { args: any; entry_point: string };
       Transfer?: { args: any };
     };
     approvals: any[];
