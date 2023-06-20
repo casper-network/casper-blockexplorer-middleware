@@ -1,4 +1,6 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
+import { CLValueParsers } from "casper-js-sdk";
+import { SidecarDeploy } from "src/types/api";
 import {
   DeployStatus,
   JsonDeployEntryPointSession,
@@ -73,4 +75,49 @@ export const determineDeploySessionData: (
   }
 
   return { action, deployType };
+};
+
+export const getProcessedSidecarDeploys = (deploys: SidecarDeploy[]) => {
+  const processedDeploys = deploys.map((deploy) => {
+    const deployHash = deploy.deploy_hash;
+    const blockHash = deploy.deploy_processed.block_hash;
+    const publicKey = deploy.deploy_processed.account;
+    const timestamp = deploy.deploy_processed.timestamp;
+    const costMotes = deploy.deploy_processed.execution_result.Success
+      ? deploy.deploy_processed.execution_result.Success.cost
+      : deploy.deploy_processed.execution_result.Failure?.cost ?? 0;
+
+    const deployAcceptedSession = deploy.deploy_accepted.session;
+
+    let amountMap;
+    if (deployAcceptedSession.ModuleBytes) {
+      amountMap = new Map(deployAcceptedSession.ModuleBytes?.args);
+    } else if (deployAcceptedSession.Transfer) {
+      amountMap = new Map(deployAcceptedSession.Transfer?.args);
+    } else if (deployAcceptedSession.StoredContractByHash) {
+      amountMap = new Map(deployAcceptedSession.StoredContractByHash?.args);
+    } else {
+      amountMap = new Map(
+        deployAcceptedSession.StoredVersionedContractByName?.args
+      );
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    const amountMotes = CLValueParsers.fromJSON(amountMap.get("amount"))
+      .unwrap()
+      .value()
+      .toString() as string;
+
+    console.log({ amountMotes });
+
+    return {
+      deployHash: "",
+      blockHash: "",
+      publicKey: "",
+      timestamp: "",
+      contractType: "",
+      amountMotes: 0,
+      costMotes: 0,
+    };
+  });
 };

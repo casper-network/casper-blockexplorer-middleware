@@ -84,7 +84,12 @@ export interface SidecarDeploy {
       chain_name: string;
     };
     payment: { ModuleBytes: any[] };
-    session: { ModuleBytes: any[] };
+    session: {
+      ModuleBytes?: { args: any };
+      StoredContractByHash?: { args: any };
+      StoredVersionedContractByName?: { args: any };
+      Transfer?: { args: any };
+    };
     approvals: any[];
   };
   deploy_processed: {
@@ -94,7 +99,10 @@ export interface SidecarDeploy {
     ttl: string;
     dependencies: any[];
     block_hash: string;
-    execution_result: { Failure: object };
+    execution_result: {
+      Failure?: { cost?: number };
+      Success?: { cost?: number };
+    };
   };
   deploy_expired: boolean;
 }

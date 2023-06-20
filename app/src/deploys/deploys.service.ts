@@ -8,6 +8,7 @@ import { DeployStatus, GetDeploy } from "src/types/deploy";
 import { ApiError } from "src/utils/ApiError";
 import {
   determineDeploySessionData,
+  getProcessedSidecarDeploys,
   JsonDeploySession,
 } from "src/utils/deploy";
 
@@ -98,6 +99,8 @@ export class DeploysService {
     orderBy = "desc"
   ) {
     const deploys = await onChain.getDeploys(count, pageNum, sortBy, orderBy);
+
+    const processedDeploys = getProcessedSidecarDeploys(deploys);
 
     if (!deploys?.length) {
       throw new ApiError(StatusCodes.NOT_FOUND, "Deploys not found.");
