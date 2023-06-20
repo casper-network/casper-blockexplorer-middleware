@@ -3,7 +3,7 @@ import { GetDeploy } from "src/types/deploy";
 
 import { DeploysController } from "./deploys.controller";
 import { DeploysService } from "./deploys.service";
-import { getDeployStub } from "./stubs/deploys.stub";
+import { getDeploysStub, getDeployStub } from "./stubs/deploys.stub";
 
 jest.mock("./deploys.service");
 
@@ -36,6 +36,13 @@ describe("DeploysController", () => {
 
     it("should return deploy", () => {
       expect(deploy).toEqual(getDeployStub());
+    });
+  });
+
+  describe("getDeploys", () => {
+    it("should return deploys", async () => {
+      const deploys = await deploysService.getDeploys();
+      expect(deploys).toEqual(getDeploysStub());
     });
   });
 });
