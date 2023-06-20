@@ -8,7 +8,7 @@ import {
 
 import { AccountsService } from "./accounts.service";
 
-export class AccountByHashOrPublicKeyParamDtp {
+export class AccountByHashOrPublicKeyParamDto {
   @IsValidPublicKeyOrHash("hashOrPublicKey", {
     message: ValidationError.HashOrPublicKey,
   })
@@ -16,7 +16,7 @@ export class AccountByHashOrPublicKeyParamDtp {
   public hashOrPublicKey: string;
 }
 
-export class AccountBalanceParamDtp {
+export class AccountBalanceParamDto {
   @IsString()
   public uref: string;
 }
@@ -27,7 +27,7 @@ export class AccountsController {
 
   @Get(":hashOrPublicKey")
   async getAccountByHashOrPublicKey(
-    @Param() params: AccountByHashOrPublicKeyParamDtp
+    @Param() params: AccountByHashOrPublicKeyParamDto
   ): Promise<StoredValue["Account"]> {
     const { hashOrPublicKey } = params;
 
@@ -37,7 +37,7 @@ export class AccountsController {
   }
 
   @Get("balance/:uref")
-  async getAccountBalance(@Param() params: AccountBalanceParamDtp) {
+  async getAccountBalance(@Param() params: AccountBalanceParamDto) {
     const { uref } = params;
 
     const balance = await this.accountsService.getBalance(uref);

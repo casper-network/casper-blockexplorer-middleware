@@ -6,7 +6,7 @@ import { IsValidHash, ValidationError } from "src/utils/nest-validation";
 
 import { DeploysService } from "./deploys.service";
 
-export class DeploysQueryDtp {
+export class DeploysQueryDto {
   @Transform(({ value }) => parseInt(value, 10))
   @IsNumber()
   @IsOptional()
@@ -28,7 +28,7 @@ export class DeploysQueryDtp {
   public orderBy: Sort = "desc";
 }
 
-export class DeploysByHashParamsDtp {
+export class DeploysByHashParamsDto {
   @IsValidHash("hash", { message: ValidationError.Hash })
   @IsString()
   public hash: string;
@@ -39,7 +39,7 @@ export class DeploysController {
   constructor(private readonly deploysService: DeploysService) {}
 
   @Get(":hash")
-  async getDeployByHash(@Param() params: DeploysByHashParamsDtp) {
+  async getDeployByHash(@Param() params: DeploysByHashParamsDto) {
     const { hash } = params;
 
     const deploy = await this.deploysService.getDeploy(hash);
@@ -48,7 +48,7 @@ export class DeploysController {
   }
 
   @Get()
-  async getDeploys(@Query() query: DeploysQueryDtp) {
+  async getDeploys(@Query() query: DeploysQueryDto) {
     const { count, pageNum, sortBy, orderBy } = query;
 
     const deploys = await this.deploysService.getDeploys(
