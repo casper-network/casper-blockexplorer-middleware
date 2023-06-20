@@ -21,10 +21,10 @@ export const getSidecarDeploysStub = () => [
       "3b0fddb3ed65ddf076892dddbcb98694921e74ea90d33137121a58985859ddcf",
     deploy_accepted: {
       hash: "3b0fddb3ed65ddf076892dddbcb98694921e74ea90d33137121a58985859ddcf",
-      header: [Object],
-      payment: [Object],
-      session: [Object],
-      approvals: [Array],
+      header: {},
+      payment: {},
+      session: {},
+      approvals: [],
     },
     deploy_processed: {
       deploy_hash:
