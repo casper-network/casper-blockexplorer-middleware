@@ -79,17 +79,12 @@ export const determineDeploySessionData: (
 
 export const getProcessedSidecarDeploys = (deploys: SidecarDeploy[]) => {
   const processedDeploys = deploys.map((deploy) => {
-    const deployHash = deploy.deploy_hash;
-    const blockHash = deploy.deploy_processed.block_hash;
-    const publicKey = deploy.deploy_processed.account;
-    const timestamp = deploy.deploy_processed.timestamp;
     const costMotes = deploy.deploy_processed.execution_result.Success
       ? deploy.deploy_processed.execution_result.Success.cost
       : deploy.deploy_processed.execution_result.Failure?.cost ?? 0;
-
     const deployAcceptedSession = deploy.deploy_accepted.session;
 
-    let amountMap;
+    let amountMap: Map<string, string>;
     let contractType: string;
     if (deployAcceptedSession.ModuleBytes) {
       amountMap = new Map(deployAcceptedSession.ModuleBytes?.args);
@@ -108,17 +103,16 @@ export const getProcessedSidecarDeploys = (deploys: SidecarDeploy[]) => {
         deployAcceptedSession.StoredVersionedContractByName.entry_point;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     const amountMotes = CLValueParsers.fromJSON(amountMap.get("amount"))
       .unwrap()
       .value()
       .toString() as string;
 
     return {
-      deployHash,
-      blockHash,
-      publicKey,
-      timestamp,
+      deployHash: deploy.deploy_hash,
+      blockHash: deploy.deploy_processed.block_hash,
+      publicKey: deploy.deploy_processed.account,
+      timestamp: deploy.deploy_processed.timestamp,
       contractType,
       amountMotes,
       costMotes,
