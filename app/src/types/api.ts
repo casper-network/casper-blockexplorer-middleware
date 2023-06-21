@@ -84,7 +84,13 @@ export interface SidecarDeploy {
       chain_name: string;
     };
     payment: { ModuleBytes: any[] };
-    session: { ModuleBytes: any[] };
+    // TODO: will be properly typing from casper-node in #94
+    session: {
+      ModuleBytes?: { args: any };
+      StoredContractByHash?: { args: any; entry_point: string };
+      StoredVersionedContractByName?: { args: any; entry_point: string };
+      Transfer?: { args: any };
+    };
     approvals: any[];
   };
   deploy_processed: {
@@ -94,7 +100,10 @@ export interface SidecarDeploy {
     ttl: string;
     dependencies: any[];
     block_hash: string;
-    execution_result: { Failure: object };
+    execution_result: {
+      Failure?: { cost?: number };
+      Success?: { cost?: number };
+    };
   };
   deploy_expired: boolean;
 }

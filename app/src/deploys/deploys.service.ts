@@ -11,6 +11,7 @@ import { DeployStatus, GetDeploy } from "src/types/deploy";
 import { ApiError } from "src/utils/ApiError";
 import {
   determineDeploySessionData,
+  getProcessedSidecarDeploys,
   JsonDeploySession,
 } from "src/utils/deploy";
 
@@ -145,6 +146,8 @@ export class DeploysService {
       }
     }
 
-    return deploys;
+    const processedDeploys = getProcessedSidecarDeploys(deploys);
+
+    return processedDeploys;
   }
 }
