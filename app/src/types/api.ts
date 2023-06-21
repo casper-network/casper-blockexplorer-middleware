@@ -84,6 +84,7 @@ export interface SidecarDeploy {
       chain_name: string;
     };
     payment: { ModuleBytes: any[] };
+    // TODO: will be properly typing from casper-node in #94
     session: {
       ModuleBytes?: { args: any };
       StoredContractByHash?: { args: any; entry_point: string };
