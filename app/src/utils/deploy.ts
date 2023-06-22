@@ -103,10 +103,15 @@ export const getProcessedSidecarDeploys = (deploys: SidecarDeploy[]) => {
         deployAcceptedSession.StoredVersionedContractByName.entry_point;
     }
 
-    const amountMotes = CLValueParsers.fromJSON(amountMap.get("amount"))
-      .unwrap()
-      .value()
-      .toString() as string;
+    let amountMotes: string;
+    if (amountMap.has("amount")) {
+      amountMotes = CLValueParsers.fromJSON(amountMap.get("amount"))
+        .unwrap()
+        .value()
+        .toString() as string;
+    } else {
+      amountMotes = "";
+    }
 
     return {
       deployHash: deploy.deploy_hash,
