@@ -1,3 +1,4 @@
+import { Logger } from "@nestjs/common";
 import axios, { AxiosInstance } from "axios";
 import { GetBlockResult } from "casper-js-sdk";
 
@@ -5,6 +6,7 @@ import { SidecarDeploy } from "./types/api";
 
 export class Sidecar {
   private api: AxiosInstance;
+  readonly logger = new Logger(Sidecar.name);
 
   constructor(public url: string) {
     this.api = axios.create({ baseURL: url });
@@ -20,7 +22,7 @@ export class Sidecar {
 
       return true;
     } catch (e) {
-      console.log("Error checking if sidecar is alive.", e);
+      this.logger.error("Error checking if sidecar is alive.", e);
 
       return false;
     }

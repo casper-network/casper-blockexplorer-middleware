@@ -1,3 +1,4 @@
+import { Logger } from "@nestjs/common";
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -20,14 +21,14 @@ export class GatewayService
   io: Namespace;
 
   afterInit(): void {
-    console.log("Websocket gateway initialized.");
+    Logger.log("Websocket gateway initialized.");
   }
 
   handleConnection(client: Socket) {
     const sockets = this.io.sockets;
 
-    console.log("WS client with id: ", client.id);
-    console.log("Number of connected sockets: ", sockets.size);
+    Logger.log("WS client with id: ", client.id);
+    Logger.log("Number of connected sockets: ", sockets.size);
   }
 
   handleEvent(event: string, ...args) {
@@ -35,6 +36,6 @@ export class GatewayService
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Websocket gateway disconnected from. ${client.id}`);
+    Logger.warn(`Websocket gateway disconnected from. ${client.id}`);
   }
 }
