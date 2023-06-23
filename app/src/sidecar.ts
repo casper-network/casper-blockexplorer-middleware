@@ -64,17 +64,17 @@ export class Sidecar {
     orderBy = "desc"
   ) {
     // TODO: updated to released version of sidecar in #88
-    const result = await this.tempDevNet.post<{ data: SidecarDeploy }>(
-      "deploys",
-      {
-        exclude_expired: true,
-        exclude_not_processed: false,
-        offset: pageNum - 1,
-        limit: count,
-        sort_column: sortBy,
-        sort_order: orderBy,
-      }
-    );
+    const result = await this.tempDevNet.post<{
+      data: SidecarDeploy[];
+      item_count: number;
+    }>("deploys", {
+      exclude_expired: true,
+      exclude_not_processed: false,
+      offset: pageNum - 1,
+      limit: count,
+      sort_column: sortBy,
+      sort_order: orderBy,
+    });
 
     return result;
   }

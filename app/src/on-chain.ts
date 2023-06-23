@@ -143,12 +143,12 @@ export class OnChain {
       try {
         const {
           status,
-          data: { data },
+          data: { data, item_count },
         } = await this.sidecar.getDeploys(count, pageNum, sortBy, orderBy);
 
         this.checkSidecarStatus(status, data, () => this.getDeploys());
 
-        return data;
+        return { deploys: data, total: item_count };
       } catch (e) {
         this.logger.error("Error requesting deploys from sidecar.", e);
 

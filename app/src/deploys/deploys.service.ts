@@ -128,7 +128,12 @@ export class DeploysService {
     orderBy = "desc",
     overrideCache?: boolean
   ) {
-    const deploys = await onChain.getDeploys(count, pageNum, sortBy, orderBy);
+    const { deploys, total } = await onChain.getDeploys(
+      count,
+      pageNum,
+      sortBy,
+      orderBy
+    );
 
     if (!deploys?.length) {
       throw new ApiError(StatusCodes.NOT_FOUND, "Deploys not found.");
@@ -148,6 +153,6 @@ export class DeploysService {
 
     const processedDeploys = getProcessedSidecarDeploys(deploys);
 
-    return processedDeploys;
+    return { deploys: processedDeploys, total };
   }
 }
