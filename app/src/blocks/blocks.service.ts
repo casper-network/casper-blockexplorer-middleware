@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
+import { CACHE_MANAGER, Inject, Injectable, Logger } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { StatusCodes } from "http-status-codes";
@@ -10,6 +10,7 @@ import { ApiError } from "src/utils/ApiError";
 
 @Injectable()
 export class BlocksService {
+  readonly logger = new Logger(BlocksService.name);
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     @Inject(GatewayService) private readonly gateway: GatewayService
@@ -116,7 +117,7 @@ export class BlocksService {
         }
         blockPromises.push(block);
       } catch (error) {
-        console.log("Error using this.getBlockByHeight", error);
+        this.logger.error("Error using this.getBlockByHeight", error);
         break;
       }
     }
