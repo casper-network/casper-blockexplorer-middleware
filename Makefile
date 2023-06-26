@@ -31,7 +31,7 @@ middleware-ci-install:
 	cd app && npm ci
 
 middleware-audit:
-	cd app && npm audit
+	cd app && npm run audit
 
 middleware-lint:
 	cd app && npm run lint
