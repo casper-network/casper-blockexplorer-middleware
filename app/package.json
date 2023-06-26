@@ -1,11 +1,12 @@
 {
-  "name": "nest-app",
-  "version": "0.0.1",
+  "name": "middleware",
+  "version": "1.4.0",
   "description": "",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "audit": "better-npm-audit audit",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -27,6 +28,7 @@
     "@nestjs/schedule": "^2.2.0",
     "@nestjs/websockets": "^9.4.1",
     "axios": "^1.4.0",
+    "better-npm-audit": "^3.7.3",
     "cache-manager": "^5.1.7",
     "casper-js-sdk": "^2.11.1",
     "class-sanitizer": "^1.0.1",
