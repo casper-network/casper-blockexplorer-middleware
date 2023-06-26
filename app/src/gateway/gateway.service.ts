@@ -22,7 +22,7 @@ export class GatewayService
   io: Namespace;
 
   afterInit(): void {
-    Logger.log("Websocket gateway initialized.");
+    this.logger.log("Websocket gateway initialized.");
   }
 
   handleConnection(client: Socket) {
