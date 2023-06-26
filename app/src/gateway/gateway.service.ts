@@ -17,6 +17,7 @@ import { Namespace, Socket } from "socket.io";
 export class GatewayService
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
+  readonly logger = new Logger(GatewayService.name);
   @WebSocketServer()
   io: Namespace;
 
@@ -27,8 +28,8 @@ export class GatewayService
   handleConnection(client: Socket) {
     const sockets = this.io.sockets;
 
-    Logger.log("WS client with id: ", client.id);
-    Logger.log("Number of connected sockets: ", sockets.size);
+    this.logger.log("WS client with id: ", client.id);
+    this.logger.log("Number of connected sockets: ", sockets.size);
   }
 
   handleEvent(event: string, ...args) {
@@ -36,6 +37,6 @@ export class GatewayService
   }
 
   handleDisconnect(client: Socket) {
-    Logger.warn(`Websocket gateway disconnected from. ${client.id}`);
+    this.logger.warn(`Websocket gateway disconnected from. ${client.id}`);
   }
 }
