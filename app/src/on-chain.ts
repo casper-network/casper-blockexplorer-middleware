@@ -1,8 +1,10 @@
+import { Logger } from "@nestjs/common";
 import { CasperServiceByJsonRPC, JsonBlock } from "casper-js-sdk";
 
 import { Sidecar } from "./sidecar";
 
 export class OnChain {
+  readonly logger = new Logger(OnChain.name);
   constructor(
     private jsonRpc: CasperServiceByJsonRPC,
     private sidecar: Sidecar,
@@ -34,7 +36,7 @@ export class OnChain {
 
         return latestBlock;
       } catch (e) {
-        console.log("Error requesting latest block from sidecar.", e);
+        this.logger.error("Error requesting latest block from sidecar.", e);
 
         this.isSidecarRunning = false;
         return this.getLatestBlock();
@@ -60,7 +62,7 @@ export class OnChain {
 
         return block;
       } catch (e) {
-        console.log("Error requesting block by height from sidecar.");
+        this.logger.error("Error requesting block by height from sidecar.");
 
         this.isSidecarRunning = false;
         return this.getBlockByHeight(height);
@@ -85,7 +87,7 @@ export class OnChain {
 
         return block;
       } catch (e) {
-        console.log("Error requesting block by hash from sidecar.");
+        this.logger.error("Error requesting block by hash from sidecar.");
 
         this.isSidecarRunning = false;
         return this.getBlockByHash(hash);
@@ -118,7 +120,7 @@ export class OnChain {
 
         return { deploy: deploy_accepted, executionResults };
       } catch (e) {
-        console.log("Error requesting deploy by hash from sidecar.");
+        this.logger.error("Error requesting deploy by hash from sidecar.", e);
 
         this.isSidecarRunning = false;
         return this.getDeploy(hash);
