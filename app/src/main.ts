@@ -7,6 +7,7 @@ import { SIDECAR_REST_URL } from "./config";
 import { nodeManager } from "./node-manager";
 import { OnChain } from "./on-chain";
 import { Sidecar } from "./sidecar";
+import { CoinGecko } from "./coin-gecko";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -22,5 +23,5 @@ export const jsonRpc = new CasperServiceByJsonRPC(
 );
 
 export const sidecar = new Sidecar(SIDECAR_REST_URL);
-
 export const onChain = new OnChain(jsonRpc, sidecar);
+export const coinGecko = new CoinGecko("https://api.coingecko.com/api/v3");

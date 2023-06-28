@@ -5,7 +5,7 @@ import { CLValueParsers } from "casper-js-sdk";
 import { StatusCodes } from "http-status-codes";
 import { BLOCK_GENERATE_INTERVAL } from "src/config";
 import { GatewayService } from "src/gateway/gateway.service";
-import { onChain } from "src/main";
+import { coinGecko, onChain } from "src/main";
 import { SidecarDeploy } from "src/types/api";
 import { DeployStatus, GetDeploy } from "src/types/deploy";
 import { ApiError } from "src/utils/ApiError";
@@ -21,6 +21,21 @@ export class DeploysService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     @Inject(GatewayService) private readonly gateway: GatewayService
   ) {}
+
+  async onModuleInit() {
+    // const coinListResult = await coinGecko.getCoinList();
+
+    const csprNetworkCoinInfo = await coinGecko.getCsprNetworkCoinInfo();
+
+    console.log({ csprNetworkCoinInfo });
+  }
+
+  @Cron("*/5 * * * *", { name: "coinGeckoSchedule" })
+  async handleCoinGeckoCron() {
+    const csprNetworkCoinInfo = await coinGecko.getCsprNetworkCoinInfo();
+
+    console.log({ csprNetworkCoinInfo });
+  }
 
   @Cron(`*/${BLOCK_GENERATE_INTERVAL / 2} * * * * *`, {
     name: "latestDeploySchedule",
