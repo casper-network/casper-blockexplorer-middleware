@@ -25,16 +25,18 @@ export class DeploysService {
   async onModuleInit() {
     // const coinListResult = await coinGecko.getCoinList();
 
-    const csprNetworkCoinInfo = await coinGecko.getCsprNetworkCoinInfo();
+    const csprNetworkCoinExchangeInfo =
+      await coinGecko.getCsprNetworkCoinExchangeInfo();
 
-    console.log({ csprNetworkCoinInfo });
+    console.log({ csprNetworkCoinExchangeInfo });
   }
 
   @Cron("*/5 * * * *", { name: "coinGeckoSchedule" })
   async handleCoinGeckoCron() {
-    const csprNetworkCoinInfo = await coinGecko.getCsprNetworkCoinInfo();
+    const csprNetworkCoinExchangeInfo =
+      await coinGecko.getCsprNetworkCoinExchangeInfo();
 
-    console.log({ csprNetworkCoinInfo });
+    console.log({ csprNetworkCoinExchangeInfo });
   }
 
   @Cron(`*/${BLOCK_GENERATE_INTERVAL / 2} * * * * *`, {

@@ -17,11 +17,17 @@ export class CoinGecko {
     }
   }
 
-  async getCsprNetworkCoinInfo() {
+  async getCsprNetworkCoinExchangeInfo() {
     try {
-      const result = await this.api.get("/coins/casper-network");
+      const {
+        data: {
+          market_data: { current_price },
+        },
+      } = await this.api.get<{
+        market_data: { current_price: { [key: string]: number } };
+      }>("/coins/casper-network");
 
-      return result;
+      return current_price;
     } catch (e) {
       console.log({ e });
     }
