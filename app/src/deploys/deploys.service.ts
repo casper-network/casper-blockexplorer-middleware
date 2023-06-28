@@ -41,7 +41,13 @@ export class DeploysService {
     if (!cachedDeploy) {
       await this.cacheManager.set(latestDeploy.deploy_hash, latestDeploy);
 
-      this.gateway.handleEvent("latest_deploy", { latestDeploy });
+      const [processedLatestDeploy] = getProcessedSidecarDeploys([
+        latestDeploy,
+      ]);
+
+      this.gateway.handleEvent("latest_deploy", {
+        latestDeploy: processedLatestDeploy,
+      });
     }
   }
 
