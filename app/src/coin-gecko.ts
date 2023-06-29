@@ -12,8 +12,9 @@ export class CoinGecko {
       const result = await this.api.get("/coins/list");
 
       return result;
-    } catch (e) {
-      console.log({ e });
+    } catch (error) {
+      // TODO: will update to use logger in #115
+      console.log("Error requesting coin list from coin gecko.", error);
     }
   }
 
@@ -21,15 +22,19 @@ export class CoinGecko {
     try {
       const {
         data: {
-          market_data: { current_price },
+          market_data: { current_price: currentExchangePrices },
         },
       } = await this.api.get<{
         market_data: { current_price: { [key: string]: number } };
       }>("/coins/casper-network");
 
-      return current_price;
-    } catch (e) {
-      console.log({ e });
+      return currentExchangePrices;
+    } catch (error) {
+      // TODO: will update to use logger in #115
+      console.log(
+        "Error requesting coin exchange info from coin gecko.",
+        error
+      );
     }
   }
 }

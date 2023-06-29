@@ -23,12 +23,13 @@ export class DeploysService {
   ) {}
 
   async onModuleInit() {
-    // const coinListResult = await coinGecko.getCoinList();
-
     const csprNetworkCoinExchangeInfo =
       await coinGecko.getCsprNetworkCoinExchangeInfo();
 
-    console.log({ csprNetworkCoinExchangeInfo });
+    await this.cacheManager.set(
+      "csprNetworkCoinExchangeInfo",
+      csprNetworkCoinExchangeInfo
+    );
   }
 
   @Cron("*/5 * * * *", { name: "coinGeckoSchedule" })
@@ -36,7 +37,10 @@ export class DeploysService {
     const csprNetworkCoinExchangeInfo =
       await coinGecko.getCsprNetworkCoinExchangeInfo();
 
-    console.log({ csprNetworkCoinExchangeInfo });
+    await this.cacheManager.set(
+      "csprNetworkCoinExchangeInfo",
+      csprNetworkCoinExchangeInfo
+    );
   }
 
   @Cron(`*/${BLOCK_GENERATE_INTERVAL / 2} * * * * *`, {
@@ -58,9 +62,19 @@ export class DeploysService {
     if (!cachedDeploy) {
       await this.cacheManager.set(latestDeploy.deploy_hash, latestDeploy);
 
-      const [processedLatestDeploy] = getProcessedSidecarDeploys([
-        latestDeploy,
-      ]);
+      const csprNetworkCoinExchangeInfo = await this.cacheManager.get<{
+        [key: string]: number;
+      }>("csprNetworkCoinExchangeInfo");
+
+      const csprToUsdConversion: number | null =
+        "usd" in csprNetworkCoinExchangeInfo
+          ? csprNetworkCoinExchangeInfo.usd
+          : null;
+
+      const [processedLatestDeploy] = getProcessedSidecarDeploys(
+        [latestDeploy],
+        csprToUsdConversion
+      );
 
       this.gateway.handleEvent("latest_deploy", {
         latestDeploy: processedLatestDeploy,
@@ -174,7 +188,19 @@ export class DeploysService {
       }
     }
 
-    const processedDeploys = getProcessedSidecarDeploys(deploys);
+    const csprNetworkCoinExchangeInfo = await this.cacheManager.get<{
+      [key: string]: number;
+    }>("csprNetworkCoinExchangeInfo");
+
+    const csprToUsdConversion: number | null =
+      "usd" in csprNetworkCoinExchangeInfo
+        ? csprNetworkCoinExchangeInfo.usd
+        : null;
+
+    const processedDeploys = getProcessedSidecarDeploys(
+      deploys,
+      csprToUsdConversion
+    );
 
     return { deploys: processedDeploys, total };
   }
