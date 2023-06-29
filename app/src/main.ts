@@ -4,7 +4,7 @@ import { CasperServiceByJsonRPC } from "casper-js-sdk";
 
 import { AppModule } from "./app.module";
 import { CoinGecko } from "./coin-gecko";
-import { SIDECAR_REST_URL } from "./config";
+import { COIN_GECKO_PUBLIC_API_URL, SIDECAR_REST_URL } from "./config";
 import { nodeManager } from "./node-manager";
 import { OnChain } from "./on-chain";
 import { Sidecar } from "./sidecar";
@@ -24,4 +24,4 @@ export const jsonRpc = new CasperServiceByJsonRPC(
 
 export const sidecar = new Sidecar(SIDECAR_REST_URL);
 export const onChain = new OnChain(jsonRpc, sidecar);
-export const coinGecko = new CoinGecko("https://api.coingecko.com/api/v3");
+export const coinGecko = new CoinGecko(COIN_GECKO_PUBLIC_API_URL);
