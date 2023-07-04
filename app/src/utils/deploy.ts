@@ -77,7 +77,10 @@ export const determineDeploySessionData: (
   return { action, deployType };
 };
 
-export const getProcessedSidecarDeploys = (deploys: SidecarDeploy[]) => {
+export const getProcessedSidecarDeploys = (
+  deploys: SidecarDeploy[],
+  csprToUsdConversion: number | null
+) => {
   const processedDeploys = deploys.map((deploy) => {
     const costMotes = deploy.deploy_processed.execution_result.Success
       ? deploy.deploy_processed.execution_result.Success.cost
@@ -121,6 +124,7 @@ export const getProcessedSidecarDeploys = (deploys: SidecarDeploy[]) => {
       contractType,
       amountMotes,
       costMotes,
+      csprToUsdConversion,
     };
   });
 

@@ -26,3 +26,5 @@ export const SIDECAR_EVENTSTREAM_URL = process.env.SIDECAR_EVENTSTREAM_URL;
 export const SIDECAR_IS_RUNNING =
   SIDECAR_REST_URL !== undefined && SIDECAR_EVENTSTREAM_URL !== undefined;
 export const PEERS_UPDATE_INTERVAL = process.env.PEERS_UPDATE_INTERVAL || 120;
+
+export const COIN_GECKO_PUBLIC_API_URL = process.env.COIN_GECKO_PUBLIC_API_URL;
