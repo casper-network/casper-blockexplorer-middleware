@@ -122,8 +122,18 @@ export const getProcessedSidecarDeploys = (
       publicKey: deploy.deploy_processed.account,
       timestamp: deploy.deploy_processed.timestamp,
       contractType,
-      amountMotes,
-      costMotes,
+      amount: {
+        motes: amountMotes,
+        usd: !Number.isNaN(amountMotes)
+          ? (Number(amountMotes) * csprToUsdConversion).toString()
+          : "",
+      },
+      cost: {
+        motes: costMotes,
+        usd: !Number.isNaN(costMotes)
+          ? (Number(costMotes) * csprToUsdConversion).toString()
+          : "",
+      },
       csprToUsdConversion,
     };
   });
