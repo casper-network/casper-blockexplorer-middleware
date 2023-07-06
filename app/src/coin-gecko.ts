@@ -1,7 +1,9 @@
+import { Logger } from "@nestjs/common";
 import axios, { AxiosInstance } from "axios";
 
 export class CoinGecko {
   private api: AxiosInstance;
+  readonly logger = new Logger(CoinGecko.name);
 
   constructor(public url: string) {
     this.api = axios.create({ baseURL: url });
@@ -13,8 +15,7 @@ export class CoinGecko {
 
       return result;
     } catch (error) {
-      // TODO: will update to use logger in #115
-      console.log("Error requesting coin list from coin gecko.", error);
+      this.logger.error("Error requesting coin list from coin gecko.", error);
     }
   }
 
@@ -30,8 +31,7 @@ export class CoinGecko {
 
       return currentExchangePrices;
     } catch (error) {
-      // TODO: will update to use logger in #115
-      console.log(
+      this.logger.error(
         "Error requesting coin exchange info from coin gecko.",
         error
       );

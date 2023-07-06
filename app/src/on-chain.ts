@@ -150,7 +150,7 @@ export class OnChain {
 
         return { deploys: data, total: item_count };
       } catch (e) {
-        console.log("Error requesting deploys from sidecar.", e);
+        this.logger.error("Error requesting deploys from sidecar.", e);
 
         this.isSidecarRunning = false;
         return this.getDeploys();
