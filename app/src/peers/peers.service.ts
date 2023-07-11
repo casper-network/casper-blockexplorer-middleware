@@ -2,7 +2,6 @@ import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { CasperServiceByJsonRPC, GetStatusResult } from "casper-js-sdk";
-import { setTimeout } from "timers/promises";
 import { GatewayService } from "src/gateway/gateway.service";
 import { jsonRpc } from "src/main";
 import { Peer, PeersWithAliveStatus } from "src/types/api";
@@ -69,6 +68,8 @@ export class PeersService {
       cachedPeers = await this.cacheManager.get<Peer[]>("peers");
     }
 
+    await this.checkArePeersAlive(cachedPeers);
+
     return {
       paginatedResult: this.paginatePeers(cachedPeers, count, pageNum),
       totalPeers: cachedPeers.length,
@@ -112,14 +113,14 @@ export class PeersService {
   };
 
   addStatusToPeer(peer: Peer, status: GetStatusResult): Peer {
-    // const stateRootHash =
+    // TODO: need to figure out what is added to Peer here:
+    // stateRootHash && timestamp
+    // OR
+    // lastBlockHash && uptime
 
     return {} as Peer;
   }
 
-  // TODO: probably want to make sure this isn't part of a cron job
-  // since fetching some of the peers will create a big delay
-  // --> need to figure out how to deal with this
   async checkArePeersAlive(peers: Peer[]): Promise<PeersWithAliveStatus[]> {
     console.log("being called again");
 
@@ -131,19 +132,6 @@ export class PeersService {
     for (const peer of peers) {
       const nodeUrl = `http://${peer.address.split(":")[0]}:7777/rpc`;
       const peerJsonRpc = new CasperServiceByJsonRPC(nodeUrl);
-
-      // console.log({ nodeUrl });
-
-      // try {
-      //   const status = await peerJsonRpc.getStatus();
-
-      //   console.log({ status });
-
-      //   peersWithAliveStatus.push(status.last_added_block_info.hash);
-      // } catch (e) {
-      //   console.log("error!!!", e);
-      //   continue;
-      // }
 
       peerJsonRpc
         .getStatus()
@@ -164,34 +152,3 @@ export class PeersService {
     return [];
   }
 }
-
-/*
-
-{
-  peersTransformed: { nodeId: 'tls:00eb..ac11', address: '65.109.17.120:35000' }
-}
-{
-  e: JSONRPCError: request to http://65.109.17.120:35000/rpc failed, reason: read ECONNRESET
-      at new JSONRPCError (/Users/matthewgibson/casper-blockexplorer-middleware/app/node_modules/@open-rpc/client-js/build/Error.js:24:28)
-      at HTTPTransport.<anonymous> (/Users/matthewgibson/casper-blockexplorer-middleware/app/node_modules/@open-rpc/client-js/build/transports/HTTPTransport.js:122:39)
-      at step (/Users/matthewgibson/casper-blockexplorer-middleware/app/node_modules/@open-rpc/client-js/build/transports/HTTPTransport.js:46:23)
-      at Object.throw (/Users/matthewgibson/casper-blockexplorer-middleware/app/node_modules/@open-rpc/client-js/build/transports/HTTPTransport.js:27:53)
-      at rejected (/Users/matthewgibson/casper-blockexplorer-middleware/app/node_modules/@open-rpc/client-js/build/transports/HTTPTransport.js:19:65)
-      at processTicksAndRejections (node:internal/process/task_queues:96:5) {
-    code: 7979,
-    data: FetchError: request to http://65.109.17.120:35000/rpc failed, reason: read ECONNRESET
-        at ClientRequest.<anonymous> (/Users/matthewgibson/casper-blockexplorer-middleware/app/node_modules/node-fetch/lib/index.js:1505:11)
-        at ClientRequest.emit (node:events:513:28)
-        at Socket.socketErrorListener (node:_http_client:494:9)
-        at Socket.emit (node:events:513:28)
-        at emitErrorNT (node:internal/streams/destroy:157:8)
-        at emitErrorCloseNT (node:internal/streams/destroy:122:3)
-        at processTicksAndRejections (node:internal/process/task_queues:83:21) {
-      type: 'system',
-      errno: 'ECONNRESET',
-      code: 'ECONNRESET'
-    }
-  }
-}
-
-*/
