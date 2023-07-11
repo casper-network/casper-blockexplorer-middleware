@@ -88,7 +88,6 @@ export class DeploysService {
     let deploy: SidecarDeploy["deploy_accepted"];
     let executionResults: {
       block_hash: string;
-      // TODO: properly type this as part of ticket #94
       /* eslint-disable  @typescript-eslint/no-explicit-any */
       result: any;
     }[];
@@ -102,7 +101,6 @@ export class DeploysService {
 
       deploy = cachedDeployByHash.deploy_accepted;
     } else {
-      // TODO: properly type this as part of ticket #94
       const processedDeploy = await onChain.getDeploy(hash);
 
       deploy = processedDeploy.deploy;
