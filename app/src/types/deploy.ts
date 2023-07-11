@@ -29,7 +29,7 @@ export interface JsonDeployWasmSession {
 }
 
 export interface GetDeploy {
-  timestamp: number | string;
+  timestamp: string;
   dateTime: Date | string;
   deployHash: string;
   blockHash: string;
