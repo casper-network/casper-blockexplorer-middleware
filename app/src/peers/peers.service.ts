@@ -20,7 +20,7 @@ export class PeersService {
     await this.fetchPeersRpc();
   }
 
-  @Cron("*/2 * * * *", { name: "fetchPeersCron" })
+  @Cron("*/1 * * * *", { name: "fetchPeersCron" })
   async handleCron() {
     await this.fetchPeersRpc();
 
@@ -56,15 +56,9 @@ export class PeersService {
       return { nodeId, address };
     });
 
-    // TODO: will want to get peers from cache first
-    // loop over this
-    // if peer from cache exists in fetched peers list, update with only nodeId and address (or maybe pass over??)
-    // if not exists, then add to list
-    // and then add list back to cache
-    // -> this will prevent us from overriding peers that already have an 'alive' status added
-    // since the alive status might take some time to add
+    const combinedPeers = this.checkPeersInCache(peersTransformed);
 
-    await this.cacheManager.set("peers", peersTransformed);
+    await this.cacheManager.set("peers", combinedPeers);
   }
 
   async getPeers(count?: number, pageNum?: number) {
@@ -79,6 +73,30 @@ export class PeersService {
       paginatedResult: this.paginatePeers(cachedPeers, count, pageNum),
       totalPeers: cachedPeers.length,
     };
+  }
+
+  async checkPeersInCache(peers: Peer[]): Promise<Peer[]> {
+    const cachedPeers = await this.cacheManager.get<Peer[]>("peers");
+
+    if (!cachedPeers?.length) {
+      return peers;
+    }
+
+    const combinedPeers = peers.map((peer) => {
+      const peerInCache = cachedPeers.find(
+        (cachedPeer) =>
+          cachedPeer.address === peer.address &&
+          cachedPeer.nodeId === peer.nodeId
+      );
+
+      if (peerInCache) {
+        return peerInCache;
+      }
+
+      return peer;
+    });
+
+    return combinedPeers;
   }
 
   paginatePeers = (peers: Peer[], count?: number, pageSize?: number) => {
@@ -122,11 +140,11 @@ export class PeersService {
       peerJsonRpc
         .getStatus()
         .then((status) => {
-          console.log("completed", peers.indexOf(peer));
+          // console.log("completed", peers.indexOf(peer));
           // TODO: probably want to call a class method here to process and add to peers cache
         })
         .catch((error) => {
-          console.log("has error", peers.indexOf(peer));
+          // console.log("has error", peers.indexOf(peer));
         });
     }
     console.log({ peersWithAliveStatus });
