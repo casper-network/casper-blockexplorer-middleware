@@ -56,7 +56,7 @@ export class PeersService {
       return { nodeId, address };
     });
 
-    const combinedPeers = this.checkPeersInCache(peersTransformed);
+    const combinedPeers = await this.checkPeersInCache(peersTransformed);
 
     await this.cacheManager.set("peers", combinedPeers);
   }
@@ -77,6 +77,8 @@ export class PeersService {
 
   async checkPeersInCache(peers: Peer[]): Promise<Peer[]> {
     const cachedPeers = await this.cacheManager.get<Peer[]>("peers");
+
+    console.log("is cachedPeers", !!cachedPeers);
 
     if (!cachedPeers?.length) {
       return peers;
@@ -109,6 +111,12 @@ export class PeersService {
     return paginatedPeers;
   };
 
+  addStatusToPeer(peer: Peer, status: GetStatusResult): Peer {
+    // const stateRootHash =
+
+    return {} as Peer;
+  }
+
   // TODO: probably want to make sure this isn't part of a cron job
   // since fetching some of the peers will create a big delay
   // --> need to figure out how to deal with this
@@ -140,11 +148,15 @@ export class PeersService {
       peerJsonRpc
         .getStatus()
         .then((status) => {
-          // console.log("completed", peers.indexOf(peer));
+          console.log("completed", peers.indexOf(peer));
           // TODO: probably want to call a class method here to process and add to peers cache
+
+          console.log({ status });
+
+          this.addStatusToPeer(peer, status);
         })
         .catch((error) => {
-          // console.log("has error", peers.indexOf(peer));
+          console.log("has error", peers.indexOf(peer));
         });
     }
     console.log({ peersWithAliveStatus });
