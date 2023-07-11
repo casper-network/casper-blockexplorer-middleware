@@ -16,7 +16,6 @@ export class DeploysQueryDto {
   @IsNumber()
   public count = 10;
 
-  // TODO: will add more sorting options #88
   @IsIn(["block_timestamp"])
   @IsString()
   @IsOptional()
