@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
+import { CACHE_MANAGER, Inject, Injectable, Logger } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { Cache } from "cache-manager";
 import { CasperServiceByJsonRPC, GetStatusResult } from "casper-js-sdk";
@@ -8,6 +8,7 @@ import { Peer, PeersWithAliveStatus } from "src/types/api";
 
 @Injectable()
 export class PeersService {
+  readonly logger = new Logger(PeersService.name);
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     @Inject(GatewayService) private readonly gateway: GatewayService
@@ -35,8 +36,6 @@ export class PeersService {
     const cachedPeers = await this.cacheManager.get<Peer[]>("peers");
 
     if (cachedPeers?.length) {
-      console.log("*** called from cron ***");
-
       await this.checkArePeersAlive(cachedPeers);
     }
   }
@@ -67,8 +66,6 @@ export class PeersService {
       await this.fetchPeersRpc();
       cachedPeers = await this.cacheManager.get<Peer[]>("peers");
     }
-
-    await this.checkArePeersAlive(cachedPeers);
 
     return {
       paginatedResult: this.paginatePeers(cachedPeers, count, pageNum),
@@ -144,11 +141,6 @@ export class PeersService {
   async checkArePeersAlive(
     peers: PeersWithAliveStatus[]
   ): Promise<PeersWithAliveStatus[]> {
-    console.log("being called again");
-
-    // http://3.136.227.9:7777/rpc
-    // 65.109.17.120:35000
-
     const peersWithAliveStatus = [];
 
     for (const peer of peers) {
@@ -158,15 +150,10 @@ export class PeersService {
       peerJsonRpc
         .getStatus()
         .then((status: GetStatusResult & { uptime: string }) => {
-          console.log("completed", peers.indexOf(peer));
-          // TODO: probably want to call a class method here to process and add to peers cache
-
-          console.log({ status });
-
           this.addStatusToPeer(peer, status);
         })
-        .catch((error) => {
-          console.log("has error", peers.indexOf(peer));
+        .catch(() => {
+          this.logger.error("Error fetching status for peer:", peer);
         });
     }
     console.log({ peersWithAliveStatus });
