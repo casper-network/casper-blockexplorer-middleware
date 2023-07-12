@@ -20,7 +20,7 @@ export class PeersService {
     await this.fetchPeersRpc();
   }
 
-  @Cron("*/1 * * * *", { name: "fetchPeersCron" })
+  @Cron("*/2 * * * *", { name: "fetchPeersCron" })
   async handleCron() {
     await this.fetchPeersRpc();
 
@@ -36,7 +36,7 @@ export class PeersService {
     const cachedPeers = await this.cacheManager.get<Peer[]>("peers");
 
     if (cachedPeers?.length) {
-      await this.checkArePeersAlive(cachedPeers);
+      await this.checkAndAddStatusToPeers(cachedPeers);
     }
   }
 
@@ -138,15 +138,13 @@ export class PeersService {
     await this.cacheManager.set("peers", updatedPeers);
   }
 
-  async checkArePeersAlive(
-    peers: PeersWithAliveStatus[]
-  ): Promise<PeersWithAliveStatus[]> {
-    const peersWithAliveStatus = [];
-
+  async checkAndAddStatusToPeers(peers: PeersWithAliveStatus[]) {
     for (const peer of peers) {
       const nodeUrl = `http://${peer.address.split(":")[0]}:7777/rpc`;
       const peerJsonRpc = new CasperServiceByJsonRPC(nodeUrl);
 
+      // we don't await so the responses aren't blocking to the entire list
+      // responses will automatically timeout after ~30s and be caught
       peerJsonRpc
         .getStatus()
         .then((status: GetStatusResult & { uptime: string }) => {
@@ -156,8 +154,5 @@ export class PeersService {
           this.logger.error("Error fetching status for peer:", peer);
         });
     }
-    console.log({ peersWithAliveStatus });
-
-    return [];
   }
 }
