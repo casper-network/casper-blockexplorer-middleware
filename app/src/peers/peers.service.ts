@@ -79,8 +79,6 @@ export class PeersService {
   async checkPeersInCache(peers: Peer[]): Promise<Peer[]> {
     const cachedPeers = await this.cacheManager.get<Peer[]>("peers");
 
-    console.log("is cachedPeers", !!cachedPeers);
-
     if (!cachedPeers?.length) {
       return peers;
     }
@@ -112,16 +110,40 @@ export class PeersService {
     return paginatedPeers;
   };
 
-  addStatusToPeer(peer: Peer, status: GetStatusResult): Peer {
-    // TODO: need to figure out what is added to Peer here:
-    // stateRootHash && timestamp
-    // OR
-    // lastBlockHash && uptime
+  async addStatusToPeer(
+    peer: PeersWithAliveStatus,
+    status: GetStatusResult & { uptime: string }
+  ) {
+    const lastAddedBlockHash = status.last_added_block_info.hash;
+    const uptime = status.uptime;
 
-    return {} as Peer;
+    const peerWithAliveStatus = { ...peer, uptime, lastAddedBlockHash };
+
+    const cachedPeers = await this.cacheManager.get<PeersWithAliveStatus[]>(
+      "peers"
+    );
+
+    if (!cachedPeers?.length) {
+      return;
+    }
+
+    const updatedPeers = cachedPeers.map((cachedPeer) => {
+      if (
+        cachedPeer.address === peerWithAliveStatus.address &&
+        cachedPeer.nodeId === peerWithAliveStatus.nodeId
+      ) {
+        return peerWithAliveStatus;
+      }
+
+      return cachedPeer;
+    });
+
+    await this.cacheManager.set("peers", updatedPeers);
   }
 
-  async checkArePeersAlive(peers: Peer[]): Promise<PeersWithAliveStatus[]> {
+  async checkArePeersAlive(
+    peers: PeersWithAliveStatus[]
+  ): Promise<PeersWithAliveStatus[]> {
     console.log("being called again");
 
     // http://3.136.227.9:7777/rpc
@@ -135,7 +157,7 @@ export class PeersService {
 
       peerJsonRpc
         .getStatus()
-        .then((status) => {
+        .then((status: GetStatusResult & { uptime: string }) => {
           console.log("completed", peers.indexOf(peer));
           // TODO: probably want to call a class method here to process and add to peers cache
 
