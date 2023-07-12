@@ -8,7 +8,13 @@ export class Sidecar {
   private api: AxiosInstance;
   readonly logger = new Logger(Sidecar.name);
 
-  constructor(public url: string) {
+  constructor(
+    public url: string,
+    // TODO: will use sidecar endpoint when ready
+    private readonly tempDevNet: AxiosInstance = axios.create({
+      baseURL: "http://jakub.devnet.casperlabs.io:8888",
+    })
+  ) {
     this.api = axios.create({ baseURL: url });
   }
 
@@ -48,6 +54,28 @@ export class Sidecar {
 
   async getDeploy(hash: string) {
     const result = await this.api.get<SidecarDeploy>(`/deploy/${hash}`);
+
+    return result;
+  }
+
+  async getDeploys(
+    count = 10,
+    pageNum = 1,
+    sortBy = "block_timestamp",
+    orderBy = "desc"
+  ) {
+    // TODO: updated to released version of sidecar in #88
+    const result = await this.tempDevNet.post<{
+      data: SidecarDeploy[];
+      item_count: number;
+    }>("deploys", {
+      exclude_expired: true,
+      exclude_not_processed: false,
+      offset: pageNum - 1,
+      limit: count,
+      sort_column: sortBy,
+      sort_order: orderBy,
+    });
 
     return result;
   }

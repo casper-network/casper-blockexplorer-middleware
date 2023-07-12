@@ -6,7 +6,7 @@ import { IsValidHash, ValidationError } from "src/utils/nest-validation";
 
 import { BlocksService } from "./blocks.service";
 
-export class BlocksQueryDtp {
+export class BlocksQueryDto {
   @Transform(({ value }) => parseInt(value, 10))
   @IsNumber()
   @IsOptional()
@@ -26,7 +26,7 @@ export class BlocksQueryDtp {
   public orderBy: Sort = "desc";
 }
 
-export class BlocksByHashOrHeightParamDtp {
+export class BlocksByHashOrHeightParamDto {
   @IsValidHash("hashOrHeight", { message: ValidationError.Hash })
   @IsString()
   public hashOrHeight: string;
@@ -37,7 +37,7 @@ export class BlocksController {
   constructor(private readonly blocksService: BlocksService) {}
 
   @Get()
-  async getBlocks(@Query() query: BlocksQueryDtp) {
+  async getBlocks(@Query() query: BlocksQueryDto) {
     const { count, orderBy, pageNum } = query;
 
     const blocks = await this.blocksService.getBlocks(count, orderBy, pageNum);
@@ -53,7 +53,7 @@ export class BlocksController {
   }
 
   @Get(":hashOrHeight")
-  async getBlockByHashOrHeight(@Param() params: BlocksByHashOrHeightParamDtp) {
+  async getBlockByHashOrHeight(@Param() params: BlocksByHashOrHeightParamDto) {
     const { hashOrHeight } = params;
 
     let block: Block;

@@ -4,7 +4,7 @@ import { IsNumber, IsOptional } from "class-validator";
 
 import { PeersService } from "./peers.service";
 
-export class PeersQueryDtp {
+export class PeersQueryDto {
   @Transform(({ value }) => parseInt(value, 10))
   @IsNumber()
   @IsOptional()
@@ -20,7 +20,7 @@ export class PeersController {
   constructor(private readonly peersService: PeersService) {}
 
   @Get()
-  async getPeers(@Query() query: PeersQueryDtp) {
+  async getPeers(@Query() query: PeersQueryDto) {
     const { pageNum, count } = query;
 
     const peers = await this.peersService.getPeers(count, pageNum);
