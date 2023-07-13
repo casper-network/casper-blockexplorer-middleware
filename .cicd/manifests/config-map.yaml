@@ -7,5 +7,6 @@ data:
   NODE_URLS: {{.Values.nodeUrls}}
   PORT: {{.Values.containerPort}}
   PEERS_UPDATE_INTERVAL: {{.Values.peersUpdateInterval}}
+  COIN_GECKO_PUBLIC_API_URL: {{.Values.coinGeckoPublicApiUrl}}
 
 
