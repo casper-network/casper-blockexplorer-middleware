@@ -11,3 +11,4 @@ ingressDomainName: <+serviceVariables.ingressDomainName>
 
 nodeUrls: <+serviceVariables.nodeUrls>
 peersUpdateInterval: <+serviceVariables.peersUpdateInterval>
+coinGeckoPublicApiUrl: <+serviceVariables.coinGeckoPublicApiUrl>
