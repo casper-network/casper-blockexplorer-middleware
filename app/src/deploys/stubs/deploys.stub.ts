@@ -14,3 +14,31 @@ export const getDeployStub = () => ({
   status: "Success",
   rawDeploy: "",
 });
+
+export const getSidecarDeploysStub = () => [
+  {
+    deploy_hash:
+      "3b0fddb3ed65ddf076892dddbcb98694921e74ea90d33137121a58985859ddcf",
+    deploy_accepted: {
+      hash: "3b0fddb3ed65ddf076892dddbcb98694921e74ea90d33137121a58985859ddcf",
+      header: {},
+      payment: {},
+      session: {},
+      approvals: [],
+    },
+    deploy_processed: {
+      deploy_hash:
+        "3b0fddb3ed65ddf076892dddbcb98694921e74ea90d33137121a58985859ddcf",
+      account:
+        "0202ed20f3a93b5386bc41b6945722b2bd4250c48f5fa0632adf546e2f3ff6f4ddee",
+      timestamp: "2023-06-15T22:13:16.579Z",
+      ttl: "30m",
+      dependencies: [],
+      block_hash:
+        "92d9b84db79132a77f76216c7d81b2243fe92ef26db885ae0d64ee585e4799fa",
+      execution_result: [Object],
+    },
+    deploy_expired: false,
+    block_timestamp: "2023-06-15T22:14:07.104Z",
+  },
+];

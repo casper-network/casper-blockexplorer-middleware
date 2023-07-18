@@ -73,6 +73,25 @@ export interface ActualBid extends Bid {
   inactive: boolean;
 }
 
+export interface ExecutableDeployItem {
+  ModuleBytes?: {
+    // args is very complicated and is not required for BE for the time being
+    args: any[];
+    module_bytes: string;
+  };
+  StoredContractByHash?: {
+    args: any[];
+    entry_point: string;
+    hash: string;
+  };
+  StoredVersionedContractByName?: {
+    args: any[];
+    entry_point: string;
+    name: string;
+  };
+  Transfer?: { args: any[] };
+}
+
 export interface SidecarDeploy {
   deploy_hash: string;
   deploy_accepted: {
@@ -83,21 +102,24 @@ export interface SidecarDeploy {
       ttl: string;
       gas_price: number;
       body_hash: string;
-      dependencies: any[];
+      dependencies: string[];
       chain_name: string;
     };
-    payment: { ModuleBytes: any[] };
-    session: { ModuleBytes: any[] };
-    approvals: any[];
+    payment: ExecutableDeployItem;
+    session: ExecutableDeployItem;
+    approvals: { signature: string; signer: string }[];
   };
   deploy_processed: {
     deploy_hash: string;
     account: string;
     timestamp: string;
     ttl: string;
-    dependencies: any[];
+    dependencies: string[];
     block_hash: string;
-    execution_result: { Failure: object };
+    execution_result: {
+      Failure?: { cost?: number };
+      Success?: { cost?: number };
+    };
   };
   deploy_expired: boolean;
 }

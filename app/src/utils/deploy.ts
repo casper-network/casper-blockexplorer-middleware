@@ -1,4 +1,6 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
+import { CLValueParsers } from "casper-js-sdk";
+import { SidecarDeploy } from "src/types/api";
 import {
   DeployStatus,
   JsonDeployEntryPointSession,
@@ -73,4 +75,68 @@ export const determineDeploySessionData: (
   }
 
   return { action, deployType };
+};
+
+export const getProcessedSidecarDeploys = (
+  deploys: SidecarDeploy[],
+  csprToUsdConversion: number | null
+) => {
+  const processedDeploys = deploys.map((deploy) => {
+    const costMotes = deploy.deploy_processed.execution_result.Success
+      ? deploy.deploy_processed.execution_result.Success.cost
+      : deploy.deploy_processed.execution_result.Failure?.cost ?? 0;
+    const deployAcceptedSession = deploy.deploy_accepted.session;
+
+    let amountMap: Map<string, string>;
+    let contractType: string;
+    if (deployAcceptedSession.ModuleBytes) {
+      amountMap = new Map(deployAcceptedSession.ModuleBytes?.args);
+      contractType = "WASM deploy";
+    } else if (deployAcceptedSession.Transfer) {
+      amountMap = new Map(deployAcceptedSession.Transfer?.args);
+      contractType = "Transfer";
+    } else if (deployAcceptedSession.StoredContractByHash) {
+      amountMap = new Map(deployAcceptedSession.StoredContractByHash?.args);
+      contractType = deployAcceptedSession.StoredContractByHash.entry_point;
+    } else {
+      amountMap = new Map(
+        deployAcceptedSession.StoredVersionedContractByName?.args
+      );
+      contractType =
+        deployAcceptedSession.StoredVersionedContractByName.entry_point;
+    }
+
+    let amountMotes: string;
+    if (amountMap.has("amount")) {
+      amountMotes = CLValueParsers.fromJSON(amountMap.get("amount"))
+        .unwrap()
+        .value()
+        .toString() as string;
+    } else {
+      amountMotes = "";
+    }
+
+    return {
+      deployHash: deploy.deploy_hash,
+      blockHash: deploy.deploy_processed.block_hash,
+      publicKey: deploy.deploy_processed.account,
+      timestamp: deploy.deploy_processed.timestamp,
+      contractType,
+      amount: {
+        motes: amountMotes,
+        usd: !Number.isNaN(amountMotes)
+          ? (Number(amountMotes) * csprToUsdConversion).toString()
+          : "",
+      },
+      cost: {
+        motes: costMotes,
+        usd: !Number.isNaN(costMotes)
+          ? (Number(costMotes) * csprToUsdConversion).toString()
+          : "",
+      },
+      csprToUsdConversion,
+    };
+  });
+
+  return processedDeploys;
 };
