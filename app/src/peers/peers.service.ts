@@ -148,11 +148,9 @@ export class PeersService {
       const nodeUrl = `http://${peer.address.split(":")[0]}:7777/rpc`;
       const peerJsonRpc = new CasperServiceByJsonRPC(nodeUrl);
 
-      // we don't await so the responses aren't blocking to the entire list
-      // responses will automatically timeout after ~30s and be caught
-
-      // TODO: should we put timer in config?
-      promiseWithTimeout(10000, peerJsonRpc.getStatus())
+      // it looks like CasperServiceByJsonRPC has a max timeout of 75000 ms
+      // so any response longer than this will automatically timeout and be caught
+      promiseWithTimeout(75000, peerJsonRpc.getStatus())
         .then((status: GetStatusResult & { uptime: string }) => {
           this.addStatusToPeer(peer, status);
           console.log({ status });
