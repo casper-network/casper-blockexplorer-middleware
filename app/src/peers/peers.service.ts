@@ -5,6 +5,7 @@ import { CasperServiceByJsonRPC, GetStatusResult } from "casper-js-sdk";
 import { GatewayService } from "src/gateway/gateway.service";
 import { jsonRpc } from "src/main";
 import { Peer, PeersWithAliveStatus } from "src/types/api";
+import { promiseWithTimeout } from "src/utils/promise";
 
 @Injectable()
 export class PeersService {
@@ -18,6 +19,8 @@ export class PeersService {
 
   async onModuleInit() {
     await this.fetchPeersRpc();
+
+    await this.handlePeersAliveCron();
   }
 
   @Cron("*/2 * * * *", { name: "fetchPeersCron" })
@@ -33,6 +36,8 @@ export class PeersService {
 
   @Cron("*/5 * * * *", { name: "peersAliveSchedule" })
   async handlePeersAliveCron() {
+    console.log("called in here");
+
     const cachedPeers = await this.cacheManager.get<Peer[]>("peers");
 
     if (cachedPeers?.length) {
@@ -111,7 +116,7 @@ export class PeersService {
     peer: PeersWithAliveStatus,
     status: GetStatusResult & { uptime: string }
   ) {
-    const lastAddedBlockHash = status.last_added_block_info.hash;
+    const lastAddedBlockHash = status.last_added_block_info?.hash;
     const uptime = status.uptime;
 
     const peerWithAliveStatus = { ...peer, uptime, lastAddedBlockHash };
@@ -145,13 +150,15 @@ export class PeersService {
 
       // we don't await so the responses aren't blocking to the entire list
       // responses will automatically timeout after ~30s and be caught
-      peerJsonRpc
-        .getStatus()
+
+      // TODO: should we put timer in config?
+      promiseWithTimeout(10000, peerJsonRpc.getStatus())
         .then((status: GetStatusResult & { uptime: string }) => {
           this.addStatusToPeer(peer, status);
+          console.log({ status });
         })
-        .catch(() => {
-          this.logger.error("Error fetching status for peer:", peer);
+        .catch((err) => {
+          this.logger.error("Error fetching status for peer:", [err, peer]);
         });
     }
   }
