@@ -4,6 +4,9 @@ import { Bid, ValidatorBid, ValidatorWeight } from "casper-js-sdk";
 export interface Peer {
   nodeId: string;
   address: string;
+}
+
+export interface PeersWithAliveStatus extends Peer {
   isAlive?: boolean | null;
   uptime?: string | null;
   lastAddedBlockHash?: string | null;
